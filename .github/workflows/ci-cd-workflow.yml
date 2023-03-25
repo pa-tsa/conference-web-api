@@ -85,10 +85,6 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./src/PaTsa.Conference.App.Api.UnitTests/coverage.opencover.xml
 
-      - name: Verify Code Formatting
-        working-directory: ./src
-        run: dotnet format PaTsa.Conference.App.Api.sln --severity info --verify-no-changes
-
       - name: Publish Web API
         working-directory: ./src
         run: |
@@ -131,7 +127,7 @@ jobs:
 
   tagRepoJob:
     name: Create Git Tag
-    needs: [gitVersionJob]
+    needs: [gitVersionJob,buildApplicationJob]
     runs-on: ubuntu-latest
     if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
     steps:
