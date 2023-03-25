@@ -8,7 +8,7 @@ public class ApiErrorModel
 
     public static ApiErrorModel Unauthorized => new()
     {
-        ErrorCode = (int) ErrorCodes.Unauthorized,
+        ErrorCode = (int)ErrorCodes.Unauthorized,
         Message = "Client is unauthorized"
     };
 }
