@@ -1,0 +1,133 @@
+name: ci-cd-workflow
+
+# Build on every push (regardless of branch) for code changes
+# Build on PR to ensure the merge is good for code changes
+# Allow manual builds
+on:
+  push:
+    paths:
+    - '.github/workflows/**'
+    - 'src/**'
+
+  pull_request:
+    paths:
+    - '.github/workflows/**'
+    - 'src/**'
+
+  workflow_dispatch:
+
+env:
+  DOCKER_REPO: ghcr.io/webstorm-tech
+
+jobs:
+  gitVersionJob:
+    name: Run GitVersion
+    runs-on: ubuntu-latest
+    outputs:
+      major: ${{ steps.execute-gitversion-step.outputs.major }}
+      minor: ${{ steps.execute-gitversion-step.outputs.minor }}
+      patch: ${{ steps.execute-gitversion-step.outputs.patch }}
+      majorMinor: ${{ steps.execute-gitversion-step.outputs.major }}.${{ steps.execute-gitversion-step.outputs.minor }}
+      releaseLabel: ${{ steps.execute-gitversion-step.outputs.major }}.${{ steps.execute-gitversion-step.outputs.minor }}.${{ steps.execute-gitversion-step.outputs.patch }}${{ steps.execute-gitversion-step.outputs.prereleaselabelwithdash }}
+      majorMinorReleaseLabel: ${{ steps.execute-gitversion-step.outputs.major }}.${{ steps.execute-gitversion-step.outputs.minor }}${{ steps.execute-gitversion-step.outputs.prereleaselabelwithdash }}
+      majorReleaseLabel: ${{ steps.execute-gitversion-step.outputs.major }}${{ steps.execute-gitversion-step.outputs.prereleaselabelwithdash }}
+      semVer: ${{ steps.execute-gitversion-step.outputs.semver }}
+      shorSha: ${{ steps.execute-gitversion-step.outputs.shortSha }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Install GitVersion
+        id: install-gitversion-step
+        uses: gittools/actions/gitversion/setup@v0.9.14
+        with:
+          versionSpec: '5.x'
+        
+      - name: Execute GitVersion
+        id: execute-gitversion-step
+        uses: gittools/actions/gitversion/execute@v0.9.14
+  
+  buildApplicationJob:
+    name: Build .NET Applciations
+    needs: gitVersionJob
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '7.0.x'
+
+      - name: Build Projects
+        working-directory: ./src
+        run: |
+          dotnet build ./PaTsa.Conference.App.Api.sln \
+            --configuration Release \
+            --nologo \
+            /p:Version=${{ needs.gitVersionJob.outputs.semVer }}
+
+      - name: Run Unit Tests
+        working-directory: ./src
+        run: |
+          dotnet test ./PaTsa.Conference.App.Api.UnitTests/PaTsa.Conference.App.Api.UnitTests.csproj \
+            --configuration Release \
+            --no-build \
+            --verbosity normal \
+            --filter "TestCategory=UnitTest" \
+            --nologo \
+            /p:CollectCoverage=true \
+            /p:CoverletOutputFormat=opencover
+
+      - name: Collect Code Coverage
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./src/PaTsa.Conference.App.Api.UnitTests/coverage.opencover.xml
+
+      - name: Verify Code Formatting
+        working-directory: ./src
+        run: dotnet format PaTsa.Conference.App.Api.sln --severity info --verify-no-changes
+
+      - name: Publish Web API
+        working-directory: ./src
+        run: |
+          dotnet publish ./PaTsa.Conference.App.Api.WebApi/PaTsa.Conference.App.Api.WebApi.csproj \
+            --configuration Release \
+            --no-build \
+            --output ${{ runner.temp }}/PaTsa.Conference.App.Api.WebApi \
+            --nologo
+
+      - uses: actions/upload-artifact@v3
+        name: Upload Published Web API App
+        with:
+          name: web-api
+          path: ${{ runner.temp }}/PaTsa.Conference.App.Api.WebApi
+          if-no-files-found: error
+
+      - uses: actions/upload-artifact@v3
+        name: Upload Code Coverage to Artifacts
+        with:
+          name: code-coverage
+          path: ./src/PaTsa.Conference.App.Api.UnitTests/coverage.opencover.xml
+          if-no-files-found: error
+
+  tagRepoJob:
+    name: Create Git Tag
+    needs: [gitVersionJob]
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+    steps:
+      - name: Create tag
+        uses: actions/github-script@v5
+        with:
+          script: |
+            github.rest.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: 'refs/tags/v${{ needs.gitVersionJob.outputs.semVer }}',
+              sha: context.sha
+            })
