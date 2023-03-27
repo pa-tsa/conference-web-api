@@ -1,3 +1,4 @@
 locals {
-  location = "eastus"
+  location       = "eastus"
+  max_throughput = 1000
 }
