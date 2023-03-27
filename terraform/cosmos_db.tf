@@ -1,5 +1,5 @@
 resource "azurerm_cosmosdb_account" "pa_tsa_conference_cosmosdb" {
-  name                      = "pa-tsa-conference-cosmosdb"
+  name                      = "pa-tsa-conference-cosmos"
   location                  = local.location
   resource_group_name       = azurerm_resource_group.pa_tsa_conference_app_api_rg.name
   offer_type                = "Standard"
@@ -14,7 +14,7 @@ resource "azurerm_cosmosdb_account" "pa_tsa_conference_cosmosdb" {
   }
 
   capacity {
-    total_throughput_limit = 1000
+    total_throughput_limit = local.max_throuput
   }
 
   consistency_policy {
@@ -26,5 +26,27 @@ resource "azurerm_cosmosdb_account" "pa_tsa_conference_cosmosdb" {
   geo_location {
     location          = local.location
     failover_priority = 0
+  }
+}
+
+resource "azurerm_cosmosdb_sql_container" "schedule_container" {
+  name                  = "schedule-container"
+  resource_group_name   = azurerm_resource_group.pa_tsa_conference_app_api_rg.name
+  account_name          = azurerm_cosmosdb_account.pa_tsa_conference_cosmosdb.name
+  database_name         = azurerm_cosmosdb_sql_database.conference_app_cosmosdb.account_name
+  partition_key_path    = "/definition/id"
+  partition_key_version = 1
+
+  autoscale_settings {
+    max_throughput = local.max_throughput
+  }
+}
+
+resource "azurerm_cosmosdb_sql_database" "conference_app_cosmosdb" {
+  name                = "conference-app-cosmosdb"
+  resource_group_name = azurerm_resource_group.pa_tsa_conference_app_api_rg.name
+  account_name        = azurerm_cosmosdb_account.pa_tsa_conference_cosmosdb.name
+  autoscale_settings {
+    max_throughput = local.max_throuput
   }
 }
