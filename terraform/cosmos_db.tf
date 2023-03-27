@@ -36,17 +36,10 @@ resource "azurerm_cosmosdb_sql_container" "schedule_container" {
   database_name         = azurerm_cosmosdb_sql_database.conference_app_cosmosdb.account_name
   partition_key_path    = "/definition/id"
   partition_key_version = 1
-
-  autoscale_settings {
-    max_throughput = local.max_throughput
-  }
 }
 
 resource "azurerm_cosmosdb_sql_database" "conference_app_cosmosdb" {
   name                = "conference-app-cosmosdb"
   resource_group_name = azurerm_resource_group.pa_tsa_conference_app_api_rg.name
   account_name        = azurerm_cosmosdb_account.pa_tsa_conference_cosmosdb.name
-  autoscale_settings {
-    max_throughput = local.max_throughput
-  }
 }
