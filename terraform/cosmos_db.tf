@@ -14,7 +14,7 @@ resource "azurerm_cosmosdb_account" "pa_tsa_conference_cosmosdb" {
   }
 
   capacity {
-    total_throughput_limit = local.max_throuput
+    total_throughput_limit = local.max_throughput
   }
 
   consistency_policy {
@@ -47,6 +47,6 @@ resource "azurerm_cosmosdb_sql_database" "conference_app_cosmosdb" {
   resource_group_name = azurerm_resource_group.pa_tsa_conference_app_api_rg.name
   account_name        = azurerm_cosmosdb_account.pa_tsa_conference_cosmosdb.name
   autoscale_settings {
-    max_throughput = local.max_throuput
+    max_throughput = local.max_throughput
   }
 }
