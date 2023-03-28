@@ -38,12 +38,41 @@ jobs:
       - name: Terraform Plan
         id: terraform-plan-step
         working-directory: terraform
-        run: terraform plan -no-color -input=false
+        run: terraform plan -no-color -out tfplan -input=false
         continue-on-error: true
+
+      - name: Publish Terraform Plan
+        id: publish-terraform-plan-step
+        uses: actions/upload-artifact@v3
+        with:
+          name: tfplan
+          path: tfplan
+      
+      - name: Create Summary String
+        id: summary-string-step
+        run: |
+          TERRAFORM_PLAN=$(terraform show -no-color tfplan)
+          
+          delimiter="$(openssl rand -hex 8)"
+          echo "summary<<${delimiter}" >> $GITHUB_OUTPUT
+          echo "#### Terraform Format and Style :paintbrush: ${{ steps.terraform-fmt-step.outcome }}" >> $GITHUB_OUTPUT
+          echo "#### Terraform Initialization :gear: ${{ steps.terraform-init-step.outcome }}" >> $GITHUB_OUTPUT
+          echo "#### Terraform Plan :book:\`${{ steps.terraform-plan-step.outcome }}" >> $GITHUB_OUTPUT
+          echo "#### Terraform Validation :robot:\`${{ steps.terraform-validate-step.outcome }}" >> $GITHUB_OUTPUT
+          echo "" >> $GITHUB_OUTPUT
+          echo "<details><summary>Show Plan</summary>" >> $GITHUB_OUTPUT
+          echo "" >> $GITHUB_OUTPUT
+          echo "```terraform\n" >> $GITHUB_OUTPUT
+          echo "$TERRAFORM_PLAN" >> $GITHUB_OUTPUT
+          echo "```" >> $GITHUB_OUTPUT
+          echo "" >> $GITHUB_OUTPUT
+          echo "</details>" >> $GITHUB_OUTPUT
+          echo "${delimiter}" >> $GITHUB_OUTPUT
+      
 
       - name: Publish Terraform Plan to Task Summary
         env:
-          SUMMARY: "${{ steps.terraform-plan-step.outputs.stdout }}"
+          SUMMARY: ${{ steps.summary-string-step.outputs.summary }}
         run: |
           echo "$SUMMARY" >> $GITHUB_STEP_SUMMARY
 
@@ -52,22 +81,11 @@ jobs:
         uses: actions/github-script@v6
         if: github.event_name == 'pull_request'
         env:
-          PLAN: "${{ steps.terraform-plan-step.outputs.stdout }}"
+          SUMMARY: ${{ steps.summary-string-step.outputs.summary }}
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const output = `#### Terraform Format and Style 🖌\`${{ steps.terraform-fmt-step.outcome }}\`
-            #### Terraform Initialization ⚙️\`${{ steps.terraform-init-step.outcome }}\`
-            #### Terraform Plan 📖\`${{ steps.terraform-plan-step.outcome }}\`
-            #### Terraform Validation 🤖\`${{ steps.terraform-validate-step.outcome }}\`
-      
-            <details><summary>Show Plan</summary>
-      
-            \`\`\`terraform\n
-            ${process.env.PLAN}
-            \`\`\`
-      
-            </details>
+            const output = `${process.env.SUMMARY}
       
             *Pushed by: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
       
