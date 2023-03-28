@@ -19,20 +19,22 @@ jobs:
 
       - name: Terraform Format
         id: terraform-fmt-step
+        working-directory: terraform
         run: terraform fmt -check
 
       - name: Terraform Init
         id: terraform-init-step
-        working-directory: ./terraform
+        working-directory: terraform
         run: terraform init
 
       - name: Terraform Validate
         id: terraform-validate-step
+        working-directory: terraform
         run: terraform validate -no-color
 
       - name: Terraform Plan
         id: terraform-plan-step
-        working-directory: ./terraform
+        working-directory: terraform
         run: terraform plan -no-color -input=false
         continue-on-error: true
 
