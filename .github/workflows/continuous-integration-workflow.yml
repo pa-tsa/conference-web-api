@@ -16,11 +16,11 @@ on:
 
 jobs:
   gitVersionJob:
-    name: Run GitVersion
+    name: GitVersion Workflow
     uses: ./.github/workflows/gitversion-reusable-workflow.yml
 
   buildApplicationJob:
-    name: Build Application
+    name: Build Workflow
     needs: gitVersionJob
     uses: ./.github/workflows/build-reusable-workflow.yml
     with:
@@ -28,5 +28,5 @@ jobs:
     secrets: inherit
 
   verifyCodeStyleJob:
-    name: Verify Code Style
+    name: Verify Code Style Workflow
     uses: ./.github/workflows/verify-code-style-reusable-workflow.yml

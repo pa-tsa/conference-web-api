@@ -9,9 +9,11 @@ on:
 
 jobs:
   gitVersionJob:
+    name: GitVersion Workflow
     uses: ./.github/workflows/gitversion-reusable-workflow.yml
 
   buildApplicationJob:
+    name: Build Workflow
     needs: gitVersionJob
     uses: ./.github/workflows/build-reusable-workflow.yml
     with:
@@ -19,12 +21,12 @@ jobs:
     secrets: inherit
 
   terraformPlanJob:
-    name: Terraform Plan
+    name: Terraform Plan Workflow
     needs: gitVersionJob
     uses: ./.github/workflows/terraform-plan-reusable-workflow.yml
     secrets: inherit
 
   verifyCodeStyleJob:
-    name: Verify Code Style
+    name: Verify Code Style Workflow
     uses: ./.github/workflows/verify-code-style-reusable-workflow.yml
   
