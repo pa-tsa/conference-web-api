@@ -41,6 +41,12 @@ jobs:
         run: terraform plan -no-color -input=false
         continue-on-error: true
 
+      - name: Publish Terraform Plan to Task Summary
+        env:
+          SUMMARY: "${{ steps.terraform-plan-step.outputs.stdout }}"
+        run: |
+          echo "$SUMMARY" >> $GITHUB_STEP_SUMMARY
+
       - name: Update Pull Request
         id: update-pr-step
         uses: actions/github-script@v6
