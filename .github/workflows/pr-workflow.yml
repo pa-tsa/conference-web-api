@@ -17,3 +17,8 @@ jobs:
     with:
       semVer: ${{ needs.gitVersionJob.outputs.semVer }}
     secrets: inherit
+
+  verifyCodeStyleJob:
+    name: Verify Code Style
+    uses: ./.github/workflows/verify-code-style-reusable-workflow.yml
+  
