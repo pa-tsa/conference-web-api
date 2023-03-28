@@ -13,7 +13,7 @@ jobs:
 
   buildApplicationJob:
     needs: gitVersionJob
-    uses: ./.github/workflow/build-reusable-workflow.yml
+    uses: ./.github/workflows/build-reusable-workflow.yml
     with:
       semVer: ${{ needs.gitVersionJob.outputs.semVer }}
     secrets: inherit
