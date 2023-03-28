@@ -9,21 +9,21 @@ on:
       - 'main'
     paths:
       - '.github/workflows/continuous-integration-workflow.yml'
-      - '.github/workflows/reusable/**'
+      - '.github/workflows/**-reusable-workflow.yml'
       - 'src/**'
 
   workflow_dispatch:
 
 jobs:
   gitVersionJob:
-    uses: ./.github/workflows/reusable/gitversion-reusable-workflow.yml
+    uses: ./.github/workflows/gitversion-reusable-workflow.yml
 
   buildApplicationJob:
     needs: gitVersionJob
-    uses: ./.github/workflow/reusable/build-reusable-workflow.yml
+    uses: ./.github/workflow/build-reusable-workflow.yml
     with:
       semVer: ${{ needs.gitVersionJob.outputs.semVer }}
     secrets: inherit
 
   verifyCodeStyleJob:
-    uses: ./.github/workflow/reusable/verify-code-style-reusable-workflow.yml
+    uses: ./.github/workflow/verify-code-style-reusable-workflow.yml

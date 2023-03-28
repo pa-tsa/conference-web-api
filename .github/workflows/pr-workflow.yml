@@ -4,16 +4,16 @@ on:
   pull_request:
     paths:
       - '.github/workflows/pr-workflow.yml'
-      - '.github/workflows/reusable/**'
+      - '.github/workflows/**-reusable-workflow.yml'
       - 'src/**'
 
 jobs:
   gitVersionJob:
-    uses: ./.github/workflows/reusable/gitversion-reusable-workflow.yml
+    uses: ./.github/workflows/gitversion-reusable-workflow.yml
 
   buildApplicationJob:
     needs: gitVersionJob
-    uses: ./.github/workflow/reusable/build-reusable-workflow.yml
+    uses: ./.github/workflow/build-reusable-workflow.yml
     with:
       semVer: ${{ needs.gitVersionJob.outputs.semVer }}
     secrets: inherit
