@@ -55,7 +55,7 @@ jobs:
           echo "" >> $GITHUB_OUTPUT
           echo "<details><summary>Show Plan</summary>" >> $GITHUB_OUTPUT
           echo "" >> $GITHUB_OUTPUT
-          echo "\`\`\`terraform\n" >> $GITHUB_OUTPUT
+          echo "\`\`\`terraform" >> $GITHUB_OUTPUT
           echo "$TERRAFORM_PLAN" >> $GITHUB_OUTPUT
           echo "\`\`\`" >> $GITHUB_OUTPUT
           echo "" >> $GITHUB_OUTPUT
