@@ -3,15 +3,24 @@ name: GitVersion Workflow
 on:
   workflow_call:
     outputs:
-      major: ${{ jobs.gitVersionJob.outputs.major }}
-      minor: ${{ jobs.gitVersionJob.outputs.minor }}
-      patch: ${{ jobs.gitVersionJob.outputs.patch }}
-      majorMinor: ${{ jobs.gitVersionJob.outputs.major }}.${{ jobs.gitVersionJob.outputs.minor }}
-      releaseLabel: ${{ jobs.gitVersionJob.outputs.major }}.${{ jobs.gitVersionJob.outputs.minor }}.${{ jobs.gitVersionJob.outputs.patch }}${{ jobs.gitVersionJob.outputs.prereleaselabelwithdash }}
-      majorMinorReleaseLabel: ${{ jobs.gitVersionJob.outputs.major }}.${{ jobs.gitVersionJob.outputs.minor }}${{ jobs.gitVersionJob.outputs.prereleaselabelwithdash }}
-      majorReleaseLabel: ${{ jobs.gitVersionJob.outputs.major }}${{ jobs.gitVersionJob.outputs.prereleaselabelwithdash }}
-      semVer: ${{ jobs.gitVersionJob.outputs.semver }}
-      shorSha: ${{ jobs.gitVersionJob.outputs.shortSha }}
+      major:
+        value: ${{ jobs.gitVersionJob.outputs.major }}
+      minor:
+        value: ${{ jobs.gitVersionJob.outputs.minor }}
+      patch:
+        value: ${{ jobs.gitVersionJob.outputs.patch }}
+      majorMinor:
+        value: ${{ jobs.gitVersionJob.outputs.majorMinor }}
+      releaseLabel:
+        value: ${{ jobs.gitVersionJob.outputs.releaseLabel }}
+      majorMinorReleaseLabel:
+        value: ${{ jobs.gitVersionJob.outputs.majorMinorReleaseLabel }}
+      majorReleaseLabel:
+        value: ${{ jobs.gitVersionJob.outputs.majorReleaseLabel }}
+      semVer:
+        value: ${{ jobs.gitVersionJob.outputs.semver }}
+      shortSha:
+        value: ${{ jobs.gitVersionJob.outputs.shortSha }}
 
 jobs:
   gitVersionJob:
@@ -26,7 +35,7 @@ jobs:
       majorMinorReleaseLabel: ${{ steps.execute-gitversion-step.outputs.major }}.${{ steps.execute-gitversion-step.outputs.minor }}${{ steps.execute-gitversion-step.outputs.prereleaselabelwithdash }}
       majorReleaseLabel: ${{ steps.execute-gitversion-step.outputs.major }}${{ steps.execute-gitversion-step.outputs.prereleaselabelwithdash }}
       semVer: ${{ steps.execute-gitversion-step.outputs.semver }}
-      shorSha: ${{ steps.execute-gitversion-step.outputs.shortSha }}
+      shortSha: ${{ steps.execute-gitversion-step.outputs.shortSha }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
