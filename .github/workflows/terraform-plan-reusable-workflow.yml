@@ -55,16 +55,16 @@ jobs:
           
           delimiter="$(openssl rand -hex 8)"
           echo "summary<<${delimiter}" >> $GITHUB_OUTPUT
-          echo "#### Terraform Format and Style :paintbrush: ${{ steps.terraform-fmt-step.outcome }}" >> $GITHUB_OUTPUT
-          echo "#### Terraform Initialization :gear: ${{ steps.terraform-init-step.outcome }}" >> $GITHUB_OUTPUT
-          echo "#### Terraform Plan :book:\`${{ steps.terraform-plan-step.outcome }}" >> $GITHUB_OUTPUT
-          echo "#### Terraform Validation :robot:\`${{ steps.terraform-validate-step.outcome }}" >> $GITHUB_OUTPUT
+          echo "#### Terraform Format and Style :paintbrush: \`${{ steps.terraform-fmt-step.outcome }}\`" >> $GITHUB_OUTPUT
+          echo "#### Terraform Initialization :gear: \`${{ steps.terraform-init-step.outcome }}\`" >> $GITHUB_OUTPUT
+          echo "#### Terraform Plan :book:\`${{ steps.terraform-plan-step.outcome }}\`" >> $GITHUB_OUTPUT
+          echo "#### Terraform Validation :robot:\`${{ steps.terraform-validate-step.outcome }}\`" >> $GITHUB_OUTPUT
           echo "" >> $GITHUB_OUTPUT
           echo "<details><summary>Show Plan</summary>" >> $GITHUB_OUTPUT
           echo "" >> $GITHUB_OUTPUT
-          echo "```terraform\n" >> $GITHUB_OUTPUT
+          echo "\`\`\`terraform\n" >> $GITHUB_OUTPUT
           echo "$TERRAFORM_PLAN" >> $GITHUB_OUTPUT
-          echo "```" >> $GITHUB_OUTPUT
+          echo "\`\`\`" >> $GITHUB_OUTPUT
           echo "" >> $GITHUB_OUTPUT
           echo "</details>" >> $GITHUB_OUTPUT
           echo "${delimiter}" >> $GITHUB_OUTPUT
