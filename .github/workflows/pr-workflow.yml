@@ -7,6 +7,10 @@ on:
       - '.github/workflows/**-reusable-workflow.yml'
       - 'src/**'
 
+permissions:
+  issues: write
+  pull-requests: write
+
 jobs:
   gitVersionJob:
     name: GitVersion Workflow
