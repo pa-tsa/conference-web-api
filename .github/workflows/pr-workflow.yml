@@ -1,0 +1,19 @@
+name: pr-workflow
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/pr-workflow.yml'
+      - '.github/workflows/reusable/**'
+      - 'src/**'
+
+jobs:
+  gitVersionJob:
+    uses: ./.github/workflows/reusable/gitversion-reusable-workflow.yml
+
+  buildApplicationJob:
+    needs: gitVersionJob
+    uses: ./.github/workflow/reusable/build-reusable-workflow.yml
+    with:
+      semVer: ${{ needs.gitVersionJob.outputs.semVer }}
+    secrets: inherit
