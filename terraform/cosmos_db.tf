@@ -3,14 +3,11 @@ resource "azurerm_cosmosdb_account" "pa_tsa_conference_cosmosdb" {
   location                  = local.location
   resource_group_name       = azurerm_resource_group.pa_tsa_conference_app_api_rg.name
   offer_type                = "Standard"
-  kind                      = "GlobalDocumentDB"
+  kind                      = "MongoDB"
   enable_automatic_failover = false
 
-  backup {
-    interval_in_minutes = 240
-    retention_in_hours  = 8
-    storage_redundancy  = "Geo"
-    type                = "Periodic"
+  capabilities {
+    name = "EnableMongo"
   }
 
   capacity {
@@ -19,8 +16,8 @@ resource "azurerm_cosmosdb_account" "pa_tsa_conference_cosmosdb" {
 
   consistency_policy {
     consistency_level       = "BoundedStaleness"
-    max_interval_in_seconds = 300
-    max_staleness_prefix    = 100000
+    max_interval_in_seconds = 400
+    max_staleness_prefix    = 200000
   }
 
   geo_location {
@@ -29,16 +26,14 @@ resource "azurerm_cosmosdb_account" "pa_tsa_conference_cosmosdb" {
   }
 }
 
-resource "azurerm_cosmosdb_sql_container" "schedule_container" {
-  name                  = "schedule-container"
-  resource_group_name   = azurerm_resource_group.pa_tsa_conference_app_api_rg.name
-  account_name          = azurerm_cosmosdb_account.pa_tsa_conference_cosmosdb.name
-  database_name         = azurerm_cosmosdb_sql_database.conference_app_cosmosdb.account_name
-  partition_key_path    = "/definition/id"
-  partition_key_version = 1
+resource "azurerm_cosmosdb_mongo_collection" "schedule_collection" {
+  account_name        = azurerm_cosmosdb_account.pa_tsa_conference_cosmosdb.name
+  database_name       = azurerm_cosmosdb_mongo_database.conference_app_cosmosdb.name
+  name                = "schedule"
+  resource_group_name = azurerm_resource_group.pa_tsa_conference_app_api_rg.name
 }
 
-resource "azurerm_cosmosdb_sql_database" "conference_app_cosmosdb" {
+resource "azurerm_cosmosdb_mongo_database" "conference_app_cosmosdb" {
   name                = "conference-app-cosmosdb"
   resource_group_name = azurerm_resource_group.pa_tsa_conference_app_api_rg.name
   account_name        = azurerm_cosmosdb_account.pa_tsa_conference_cosmosdb.name
