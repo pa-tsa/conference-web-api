@@ -6,6 +6,7 @@ on:
       - '.github/workflows/pr-workflow.yml'
       - '.github/workflows/**-reusable-workflow.yml'
       - 'src/**'
+      - 'terraform/**'
 
 permissions:
   issues: write
