@@ -1,0 +1,27 @@
+name: continuous-delivery-workflow
+
+on:
+  push:
+    branches:
+      - 'main'
+
+  workflow_dispatch:
+
+jobs:
+  gitVersionJob:
+    name: GitVersion Workflow
+    uses: ./.github/workflows/gitversion-reusable-workflow.yml
+
+  buildApplicationJob:
+    name: Build Workflow
+    needs: gitVersionJob
+    uses: ./.github/workflows/build-reusable-workflow.yml
+    with:
+      semVer: ${{ needs.gitVersionJob.outputs.semVer }}
+    secrets: inherit
+
+  terraformApplyJob:
+    name: Terraform Apply Workflow
+    needs: buildApplicationJob
+    uses: ./.github/workflows/terraform-apply-reusable-workflow.yml
+    secrets: inherit
