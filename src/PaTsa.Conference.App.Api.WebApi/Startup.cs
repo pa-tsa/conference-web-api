@@ -9,6 +9,7 @@ using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using PaTsa.Conference.App.Api.WebApi.Middleware;
+using PaTsa.Conference.App.Api.WebApi.Services;
 using PaTsa.Conference.App.Api.WebApi.Swagger;
 
 namespace PaTsa.Conference.App.Api.WebApi
@@ -46,11 +47,11 @@ namespace PaTsa.Conference.App.Api.WebApi
         {
             //services.Configure<PointOfSalesDatabase>(Configuration.GetSection(ConfigurationKeys.ConferenceDatabaseSection));
 
-            // Injectable Services
-
-            // Cosmos DB Services
+            // MongoDB Services
+            services.AddSingleton<IConferenceEventsService, ConferenceEventsService>();
 
             // Pingable Services - Should match MongoDB Services
+            services.AddSingleton<IPingableService, ConferenceEventsService>();
 
             // Validators;
 
