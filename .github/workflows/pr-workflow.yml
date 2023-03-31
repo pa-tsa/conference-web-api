@@ -8,10 +8,6 @@ on:
       - 'src/**'
       - 'terraform/**'
 
-permissions:
-  issues: write
-  pull-requests: write
-
 jobs:
   gitVersionJob:
     name: PR - GitVersion Workflow
@@ -20,6 +16,9 @@ jobs:
   buildApplicationJob:
     name: PR - Build Workflow
     needs: gitVersionJob
+    permissions:
+      issues: write
+      pull-requests: write
     uses: ./.github/workflows/build-reusable-workflow.yml
     with:
       semVer: ${{ needs.gitVersionJob.outputs.semVer }}
