@@ -244,7 +244,7 @@ public class StatusControllerTests
         Assert.NotEmpty(attributes);
         Assert.Single(attributes);
 
-        var producesAttribute = (ProducesAttribute) attributes[0];
+        var producesAttribute = (ProducesAttribute)attributes[0];
 
         Assert.Contains("application/json", producesAttribute.ContentTypes);
     }
@@ -261,7 +261,7 @@ public class StatusControllerTests
         Assert.NotEmpty(attributes);
         Assert.Single(attributes);
 
-        var routeAttribute = (RouteAttribute) attributes[0];
+        var routeAttribute = (RouteAttribute)attributes[0];
 
         Assert.Equal("api/[controller]", routeAttribute.Template);
     }
