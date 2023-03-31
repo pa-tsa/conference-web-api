@@ -22,6 +22,14 @@ jobs:
 
   terraformApplyJob:
     name: Terraform Apply Workflow
-    needs: buildApplicationJob
+    needs: gitVersionJob
     uses: ./.github/workflows/terraform-apply-reusable-workflow.yml
+    secrets: inherit
+
+  tagRepoJob:
+    name: Tag Repo Workflow
+    needs: gitVersionJob
+    uses: ./.github/workflows/tag-repo-reusable-workflow.yml
+    with:
+      semVer: ${{ needs.gitVersionJob.outputs.semVer }}
     secrets: inherit
