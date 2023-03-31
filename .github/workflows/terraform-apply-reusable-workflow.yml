@@ -33,4 +33,4 @@ jobs:
       - name: Terraform Apply
         id: terraform-apply-step
         working-directory: terraform
-        run: terraform apply -auto-aprove -input=false
+        run: terraform apply -auto-approve -input=false
