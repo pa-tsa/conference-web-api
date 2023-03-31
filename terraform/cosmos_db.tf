@@ -26,10 +26,10 @@ resource "azurerm_cosmosdb_account" "pa_tsa_conference_cosmosdb" {
   }
 }
 
-resource "azurerm_cosmosdb_mongo_collection" "schedule_collection" {
+resource "azurerm_cosmosdb_mongo_collection" "conference_events_collection" {
   account_name        = azurerm_cosmosdb_account.pa_tsa_conference_cosmosdb.name
   database_name       = azurerm_cosmosdb_mongo_database.conference_app_cosmosdb.name
-  name                = "schedule"
+  name                = "conference-events"
   resource_group_name = azurerm_resource_group.pa_tsa_conference_app_api_rg.name
 }
 

@@ -17,7 +17,7 @@ public class StatusControllerTests
 {
     private static void AssertServiceStatus(ServicesStatusModel servicesStatusModel, PingableServiceFailures pingableServiceFailures)
     {
-        throw new NotImplementedException();
+        Assert.Equal(servicesStatusModel.ConferenceEventsServiceIsAlive, !pingableServiceFailures.HasFlag(PingableServiceFailures.ConferenceEvents));
     }
 
     private static IList<IPingableService> BuildHealthyPingableServices()
@@ -94,7 +94,7 @@ public class StatusControllerTests
 
     #region Inline Data
 
-    [InlineData(PingableServiceFailures.None)]
+    [InlineData(PingableServiceFailures.ConferenceEvents)]
 
     #endregion
 
@@ -130,7 +130,7 @@ public class StatusControllerTests
 
     #region Inline Data
 
-    [InlineData(PingableServiceFailures.None)]
+    [InlineData(PingableServiceFailures.ConferenceEvents)]
 
     #endregion
 
@@ -165,7 +165,7 @@ public class StatusControllerTests
 
     private static Type[] GetServiceTypes()
     {
-        return Type.EmptyTypes;
+        return new[] { typeof(ConferenceEventsService) };
     }
 
     [Fact]
@@ -244,7 +244,7 @@ public class StatusControllerTests
         Assert.NotEmpty(attributes);
         Assert.Single(attributes);
 
-        var producesAttribute = (ProducesAttribute) attributes[0];
+        var producesAttribute = (ProducesAttribute)attributes[0];
 
         Assert.Contains("application/json", producesAttribute.ContentTypes);
     }
@@ -261,7 +261,7 @@ public class StatusControllerTests
         Assert.NotEmpty(attributes);
         Assert.Single(attributes);
 
-        var routeAttribute = (RouteAttribute) attributes[0];
+        var routeAttribute = (RouteAttribute)attributes[0];
 
         Assert.Equal("api/[controller]", routeAttribute.Template);
     }
@@ -334,7 +334,8 @@ public class StatusControllerTests
 [Flags]
 public enum PingableServiceFailures
 {
-    None = 0
+    None = 0,
+    ConferenceEvents = 1 << 0
 }
 
 public enum ServiceFailureType
