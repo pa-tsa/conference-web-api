@@ -7,6 +7,9 @@ on:
 
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   gitVersionJob:
     name: CD - GitVersion Workflow
@@ -28,7 +31,7 @@ jobs:
 
   tagRepoJob:
     name: CD - Tag Repo Workflow
-    needs: gitVersionJob
+    needs: [buildApplicationJob, terraformApplyJob]
     uses: ./.github/workflows/tag-repo-reusable-workflow.yml
     with:
       semVer: ${{ needs.gitVersionJob.outputs.semVer }}
