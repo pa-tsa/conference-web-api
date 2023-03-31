@@ -1,4 +1,4 @@
-name: continuous-integration-workflow
+name: Continuous Integration Workflow
 
 # Build on every push (regardless of branch) for code changes
 # Build on PR to ensure the merge is good for code changes
@@ -16,11 +16,11 @@ on:
 
 jobs:
   gitVersionJob:
-    name: GitVersion Workflow
+    name: CI - GitVersion Workflow
     uses: ./.github/workflows/gitversion-reusable-workflow.yml
 
   buildApplicationJob:
-    name: Build Workflow
+    name: CI - Build Workflow
     needs: gitVersionJob
     uses: ./.github/workflows/build-reusable-workflow.yml
     with:
@@ -28,5 +28,5 @@ jobs:
     secrets: inherit
 
   verifyCodeStyleJob:
-    name: Verify Code Style Workflow
+    name: CI - Verify Code Style Workflow
     uses: ./.github/workflows/verify-code-style-reusable-workflow.yml
