@@ -1,4 +1,4 @@
-name: continuous-delivery-workflow
+name: Continuous Delivery Workflow
 
 on:
   push:
@@ -9,11 +9,11 @@ on:
 
 jobs:
   gitVersionJob:
-    name: GitVersion Workflow
+    name: CD - GitVersion Workflow
     uses: ./.github/workflows/gitversion-reusable-workflow.yml
 
   buildApplicationJob:
-    name: Build Workflow
+    name: CD - Build Workflow
     needs: gitVersionJob
     uses: ./.github/workflows/build-reusable-workflow.yml
     with:
@@ -21,7 +21,15 @@ jobs:
     secrets: inherit
 
   terraformApplyJob:
-    name: Terraform Apply Workflow
-    needs: buildApplicationJob
+    name: CD - Terraform Apply Workflow
+    needs: gitVersionJob
     uses: ./.github/workflows/terraform-apply-reusable-workflow.yml
+    secrets: inherit
+
+  tagRepoJob:
+    name: CD - Tag Repo Workflow
+    needs: gitVersionJob
+    uses: ./.github/workflows/tag-repo-reusable-workflow.yml
+    with:
+      semVer: ${{ needs.gitVersionJob.outputs.semVer }}
     secrets: inherit
