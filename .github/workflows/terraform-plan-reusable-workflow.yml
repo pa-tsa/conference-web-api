@@ -77,9 +77,7 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const output = `${process.env.SUMMARY}
-      
-            *Pushed by: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
+            const output = `${process.env.SUMMARY}`;
       
             github.rest.issues.createComment({
               issue_number: context.issue.number,

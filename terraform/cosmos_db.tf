@@ -31,6 +31,11 @@ resource "azurerm_cosmosdb_mongo_collection" "conference_events_collection" {
   database_name       = azurerm_cosmosdb_mongo_database.conference_app_cosmosdb.name
   name                = "conference-events"
   resource_group_name = azurerm_resource_group.pa_tsa_conference_app_api_rg.name
+
+  index {
+    keys   = ["_id"]
+    unique = true
+  }
 }
 
 resource "azurerm_cosmosdb_mongo_database" "conference_app_cosmosdb" {
