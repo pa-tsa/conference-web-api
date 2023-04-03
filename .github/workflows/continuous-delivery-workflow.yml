@@ -31,7 +31,7 @@ jobs:
 
   tagRepoJob:
     name: CD - Tag Repo Workflow
-    needs: [buildApplicationJob, terraformApplyJob]
+    needs: [gitVersionJob, buildApplicationJob, terraformApplyJob]
     uses: ./.github/workflows/tag-repo-reusable-workflow.yml
     with:
       semVer: ${{ needs.gitVersionJob.outputs.semVer }}
