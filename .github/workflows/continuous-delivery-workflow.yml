@@ -23,6 +23,7 @@ jobs:
       semVer: ${{ needs.gitVersionJob.outputs.semVer }}
     secrets: inherit
 
+  # TODO: Make this a deploy job and deploy to production
   terraformApplyJob:
     name: CD - Terraform Apply Workflow
     needs: gitVersionJob
