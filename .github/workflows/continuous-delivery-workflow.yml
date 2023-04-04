@@ -29,9 +29,17 @@ jobs:
     uses: ./.github/workflows/terraform-apply-reusable-workflow.yml
     secrets: inherit
 
+  deployApplicationJob:
+    name: CD - Deploy Workflow
+    needs: [buildApplicationJob, terraformApplyJob]
+    uses: ./.github/workflows/deploy-reusable-workflow.yml
+    with:
+      environment: production
+    secrets: inherit
+
   tagRepoJob:
     name: CD - Tag Repo Workflow
-    needs: [gitVersionJob, buildApplicationJob, terraformApplyJob]
+    needs: [gitVersionJob, deployApplicationJob]
     uses: ./.github/workflows/tag-repo-reusable-workflow.yml
     with:
       semVer: ${{ needs.gitVersionJob.outputs.semVer }}
