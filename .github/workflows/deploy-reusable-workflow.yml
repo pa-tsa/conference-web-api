@@ -21,6 +21,10 @@ jobs:
         with:
           name: web-api
 
+      - run: |
+          pwd
+          ls -l /home/runner/work/pa-tsa-conference-app-api/pa-tsa-conference-app-api
+
       - uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
