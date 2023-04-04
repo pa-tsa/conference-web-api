@@ -34,6 +34,7 @@ jobs:
     needs: [buildApplicationJob, terraformApplyJob]
     uses: ./.github/workflows/deploy-reusable-workflow.yml
     with:
+      azureAppName: pa-tsa-conference-app-api-app
       environment: production
     secrets: inherit
 
