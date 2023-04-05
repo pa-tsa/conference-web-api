@@ -32,5 +32,7 @@ jobs:
 
       - name: Terraform Apply
         id: terraform-apply-step
+        env:
+          TF_VAR_API_KEY: ${{ secrets.API_KEY }}
         working-directory: terraform
         run: terraform apply -auto-approve -input=false
