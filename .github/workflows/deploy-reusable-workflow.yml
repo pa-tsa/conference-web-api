@@ -20,11 +20,11 @@ jobs:
       - uses: actions/download-artifact@v3
         with:
           name: web-api
+          path: web-api
 
       - run: |
           pwd
           ls -l
-          ls -l /home/runner/work/pa-tsa-conference-app-api/pa-tsa-conference-app-api
 
       - uses: azure/login@v1
         with:
