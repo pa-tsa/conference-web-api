@@ -23,6 +23,7 @@ jobs:
 
       - run: |
           pwd
+          ls -l
           ls -l /home/runner/work/pa-tsa-conference-app-api/pa-tsa-conference-app-api
 
       - uses: azure/login@v1
