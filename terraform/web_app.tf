@@ -15,7 +15,7 @@ resource "azurerm_linux_web_app" "pa_tsa_conference_app_api" {
 
   app_settings = {
     "ApiKey"                           = var.api_key
-    "ConferenceDatabase__DatabaseName" = azurerm_cosmosdb_account.pa_tsa_conference_cosmosdb.name
+    "ConferenceDatabase__DatabaseName" = azurerm_cosmosdb_mongo_database.conference_app_cosmosdb.name
   }
 
   connection_string {
