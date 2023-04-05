@@ -14,13 +14,14 @@ resource "azurerm_linux_web_app" "pa_tsa_conference_app_api" {
   https_only          = true
 
   app_settings = {
-    "ApiKey" = var.api_key
+    "ApiKey"                           = var.api_key
+    "ConferenceDatabase__DatabaseName" = azurerm_cosmosdb_account.pa_tsa_conference_cosmosdb.name
   }
 
   connection_string {
     name  = "MongoDb"
     type  = "Custom"
-    value = azurerm_cosmosdb_account.pa_tsa_conference_cosmosdb.primary_key
+    value = azurerm_cosmosdb_account.pa_tsa_conference_cosmosdb.connection_strings.0
   }
 
   site_config {
