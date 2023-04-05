@@ -22,10 +22,6 @@ jobs:
           name: web-api
           path: web-api
 
-      - run: |
-          pwd
-          ls -l
-
       - uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
@@ -37,4 +33,4 @@ jobs:
       - uses: azure/webapps-deploy@v2
         with:
           app-name: ${{ inputs.azureAppName }}
-          package: web-api.zip
+          package: web-api
