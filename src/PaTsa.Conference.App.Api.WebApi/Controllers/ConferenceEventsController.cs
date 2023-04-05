@@ -37,4 +37,20 @@ public class ConferenceEventsController : ControllerBase
                 .Take(pageSize)
                 .ToList();
     }
+
+    [HttpPost]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    public async Task<CreatedAtActionResult> Post(ConferenceEventModel conferenceEventModel, CancellationToken cancellationToken = default)
+    {
+        var conferenceEvent = conferenceEventModel.ToEntity();
+
+        // TODO: Added to ToEntity method
+        conferenceEvent.Id = null;
+
+        await _conferenceEventsService.CreateAsync(conferenceEvent, cancellationToken);
+
+        conferenceEventModel.Id = conferenceEvent.Id;
+
+        return CreatedAtAction(nameof(Get), new { id = conferenceEvent.Id }, conferenceEventModel);
+    }
 }
