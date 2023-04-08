@@ -24,7 +24,7 @@ public class ApiKeyHeaderFilter : IOperationFilter
     public void Apply(OpenApiOperation operation, OperationFilterContext context)
     {
         if (string.Equals(context.ApiDescription.HttpMethod, "get", StringComparison.InvariantCultureIgnoreCase)) return;
-        
+
         var apiKey = Configuration.GetValue<string>(ApiKeyAuthorizationAttribute.ApiKeyConfigValue);
 
         operation.Parameters ??= new List<OpenApiParameter>();
