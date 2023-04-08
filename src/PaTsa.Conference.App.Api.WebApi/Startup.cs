@@ -10,7 +10,6 @@ using MongoDB.Driver;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using PaTsa.Conference.App.Api.WebApi.Configuration;
-using PaTsa.Conference.App.Api.WebApi.Middleware;
 using PaTsa.Conference.App.Api.WebApi.Services;
 using PaTsa.Conference.App.Api.WebApi.Swagger;
 
@@ -39,8 +38,6 @@ public class Startup
         app.UseRouting();
 
         app.UseAuthorization();
-
-        app.UseMiddleware<ApiKeyMiddleware>();
 
         app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
     }

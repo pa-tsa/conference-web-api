@@ -2,8 +2,10 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using PaTsa.Conference.App.Api.WebApi.Authorization;
 using PaTsa.Conference.App.Api.WebApi.Entities;
 using PaTsa.Conference.App.Api.WebApi.Models;
 using PaTsa.Conference.App.Api.WebApi.Services;
@@ -39,6 +41,7 @@ public class ConferenceEventsController : ControllerBase
     }
 
     [HttpPost]
+    [ApiKeyAuthorization]
     [ProducesResponseType(StatusCodes.Status201Created)]
     public async Task<CreatedAtActionResult> Post(ConferenceEventModel conferenceEventModel, CancellationToken cancellationToken = default)
     {
