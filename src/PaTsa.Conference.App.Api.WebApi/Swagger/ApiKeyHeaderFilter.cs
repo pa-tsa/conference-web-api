@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.Configuration;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
-using PaTsa.Conference.App.Api.WebApi.Middleware;
+using PaTsa.Conference.App.Api.WebApi.Authorization;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace PaTsa.Conference.App.Api.WebApi.Swagger;
@@ -22,7 +23,9 @@ public class ApiKeyHeaderFilter : IOperationFilter
 
     public void Apply(OpenApiOperation operation, OperationFilterContext context)
     {
-        var apiKey = Configuration.GetValue<string>(ApiKeyMiddleware.ApiKeyConfigValue);
+        if (string.Equals(context.ApiDescription.HttpMethod, "get", StringComparison.InvariantCultureIgnoreCase)) return;
+        
+        var apiKey = Configuration.GetValue<string>(ApiKeyAuthorizationAttribute.ApiKeyConfigValue);
 
         operation.Parameters ??= new List<OpenApiParameter>();
 
@@ -30,7 +33,7 @@ public class ApiKeyHeaderFilter : IOperationFilter
         {
             In = ParameterLocation.Header,
             Example = new OpenApiString(apiKey),
-            Name = ApiKeyMiddleware.ApiHeaderKey,
+            Name = ApiKeyAuthorizationAttribute.ApiHeaderKey,
             Required = true
         });
     }
