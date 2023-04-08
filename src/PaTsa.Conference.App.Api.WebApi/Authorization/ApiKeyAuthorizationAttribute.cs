@@ -7,6 +7,7 @@ using PaTsa.Conference.App.Api.WebApi.Models;
 
 namespace PaTsa.Conference.App.Api.WebApi.Authorization;
 
+[AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
 public class ApiKeyAuthorizationAttribute : Attribute, IAuthorizationFilter
 {
     public const string ApiHeaderKey = "X-API-Key";
