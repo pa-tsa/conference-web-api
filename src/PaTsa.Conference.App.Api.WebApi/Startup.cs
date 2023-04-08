@@ -40,8 +40,6 @@ public class Startup
 
         app.UseAuthorization();
 
-        app.UseMiddleware<ApiKeyMiddleware>();
-
         app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
     }
 
