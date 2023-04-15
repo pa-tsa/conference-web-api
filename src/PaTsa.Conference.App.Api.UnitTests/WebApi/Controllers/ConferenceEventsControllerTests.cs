@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Moq;
 using PaTsa.Conference.App.Api.UnitTests.Data;
 using PaTsa.Conference.App.Api.UnitTests.Helpers;
+using PaTsa.Conference.App.Api.WebApi.Authorization;
 using PaTsa.Conference.App.Api.WebApi.Controllers;
 using PaTsa.Conference.App.Api.WebApi.Entities;
 using PaTsa.Conference.App.Api.WebApi.Models;
@@ -53,6 +54,17 @@ public class ConferenceEventsControllerTests
 
     [Fact]
     [Trait("TestCategory", "UnitTest")]
+    public void Controller_Methods_That_Modify_Data_Should_Have_ApiKeyAuthorization_Attribute()
+    {
+        var conferenceEventsControllerType = typeof(ConferenceEventsController);
+
+        var methodInfos = conferenceEventsControllerType.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly);
+
+        Assert.NotEmpty(methodInfos);
+    }
+
+    [Fact]
+    [Trait("TestCategory", "UnitTest")]
     public void Controller_Public_Methods_Should_Have_Http_Method_Attribute()
     {
         var conferenceEventsControllerType = typeof(ConferenceEventsController);
@@ -63,41 +75,15 @@ public class ConferenceEventsControllerTests
 
         foreach (var methodInfo in methodInfos)
         {
-            // Needs to be nullable so the compiler sees it's initialized
-            // The Assert.Fail doesn't tell it that the line it's being used
-            // will only ever be hit if it's initialized
-            Type? attributeType = null;
-
-            switch (methodInfo.Name.ToLower())
+            if (!methodInfo.CustomAttributes.Any(_ =>
+                    _.AttributeType == typeof(HttpDeleteAttribute) ||
+                    _.AttributeType == typeof(HttpPostAttribute) ||
+                    _.AttributeType == typeof(HttpPutAttribute)))
             {
-                case "delete":
-                    attributeType = typeof(HttpDeleteAttribute);
-                    break;
-                case "get":
-                    attributeType = typeof(HttpGetAttribute);
-                    break;
-                case "head":
-                    attributeType = typeof(HttpHeadAttribute);
-                    break;
-                case "options":
-                    attributeType = typeof(HttpOptionsAttribute);
-                    break;
-                case "patch":
-                    attributeType = typeof(HttpPatchAttribute);
-                    break;
-                case "post":
-                    attributeType = typeof(HttpPostAttribute);
-                    break;
-                case "put":
-                    attributeType = typeof(HttpPutAttribute);
-                    break;
-                default:
-                    Assert.Fail("Unsupported public HTTP operation");
-                    break;
+                continue;
             }
 
-            var attributes = methodInfo.GetCustomAttributes(attributeType, false);
-
+            var attributes = methodInfo.GetCustomAttributes(typeof(ApiKeyAuthorizationAttribute), false);
             Assert.NotNull(attributes);
             Assert.NotEmpty(attributes);
             Assert.Single(attributes);
@@ -153,6 +139,51 @@ public class ConferenceEventsControllerTests
 
     [Fact]
     [Trait("TestCategory", "UnitTest")]
+    public async void Get_By_Id_Should_Return_Not_Found()
+    {
+        // Arrange
+        var mockedConferenceEventsService = new Mock<IConferenceEventsService>();
+
+        var conferenceEventsController = new ConferenceEventsController(mockedConferenceEventsService.Object);
+
+        // Act
+        var actionResult = await conferenceEventsController.Get(id: "1");
+
+        // Assert
+        Assert.NotNull(actionResult.Result);
+
+        Assert.IsType<NotFoundResult>(actionResult.Result);
+    }
+
+    [Fact]
+    [Trait("TestCategory", "UnitTest")]
+    public async void Get_By_Id_Should_Return_Ok()
+    {
+        // Arrange
+        var conferenceEventsTestData = new ConferenceEventsTestData();
+
+        var conferenceEvent =
+            conferenceEventsTestData.First(_ => (ConferenceEventDataIssues)_[1] == ConferenceEventDataIssues.None)[0] as ConferenceEvent;
+
+        var id = conferenceEvent!.Id;
+
+        var mockedConferenceEventsService = new Mock<IConferenceEventsService>();
+        mockedConferenceEventsService
+            .Setup(_ => _.GetAsync(It.Is(id, new StringEqualityComparer())!, default))
+            .ReturnsAsync(conferenceEvent);
+
+        var conferenceEventsController = new ConferenceEventsController(mockedConferenceEventsService.Object);
+
+        // Act
+        var actionResult = await conferenceEventsController.Get(id: id!);
+
+        Assert.NotNull(actionResult);
+        Assert.NotNull(actionResult.Value);
+        Assert.Equal(conferenceEvent.ToModel(), actionResult.Value, new ConferenceEventModelEqualityComparer());
+    }
+
+    [Fact]
+    [Trait("TestCategory", "UnitTest")]
     public async void Get_Should_Return_Ok_When_Empty()
     {
         // Arrange
@@ -164,7 +195,7 @@ public class ConferenceEventsControllerTests
         var conferenceEventsController = new ConferenceEventsController(mockedConferenceEventsService.Object);
 
         // Act
-        var actionResult = await conferenceEventsController.Get(null);
+        var actionResult = await conferenceEventsController.Get(types: null);
 
         Assert.NotNull(actionResult);
 
@@ -194,7 +225,7 @@ public class ConferenceEventsControllerTests
         var conferenceEventsController = new ConferenceEventsController(mockedConferenceEventsService.Object);
 
         // Act
-        var actionResult = await conferenceEventsController.Get(null);
+        var actionResult = await conferenceEventsController.Get(types: null);
 
         Assert.NotNull(actionResult);
 
@@ -231,7 +262,7 @@ public class ConferenceEventsControllerTests
         var conferenceEventsController = new ConferenceEventsController(mockedConferenceEventsService.Object);
 
         // Act
-        var actionResult = await conferenceEventsController.Get(types);
+        var actionResult = await conferenceEventsController.Get(types: types);
 
         Assert.NotNull(actionResult);
 
@@ -310,5 +341,60 @@ public class ConferenceEventsControllerTests
         Assert.IsType<ConferenceEventModel>(createdAtActionResult.Value);
 
         mockedConferenceEventsService.Verify(_ => _.CreateAsync(It.Is(conferenceEvent, new ConferenceEventEqualityComparer()), default), Times.Once);
+    }
+
+    [Fact]
+    [Trait("TestCategory", "UnitTest")]
+    public async void Put_Should_Return_No_Content()
+    {
+        // Arrange
+        var conferenceEventsTestData = new ConferenceEventsTestData();
+
+        var conferenceEvent = (ConferenceEvent)conferenceEventsTestData.First(_ => (ConferenceEventDataIssues)_[1] == ConferenceEventDataIssues.None)[0];
+
+        var updatedConferenceEvent = new ConferenceEventModel
+        {
+            Description = conferenceEvent.Description + "-Updated",
+            EndDateTime = conferenceEvent.EndDateTime.AddHours(1),
+            Id = conferenceEvent.Id,
+            Location = conferenceEvent.Location + "-Updated",
+            Name = conferenceEvent.Name + "-Updated",
+            StartDateTime = conferenceEvent.StartDateTime.AddHours(1),
+            Type = conferenceEvent.Type + "-Updated"
+        };
+
+        var id = conferenceEvent.Id;
+
+        var mockedConferenceEventsService = new Mock<IConferenceEventsService>();
+        mockedConferenceEventsService
+            .Setup(_ => _.GetAsync(It.Is(id, new StringEqualityComparer())!, default))
+            .ReturnsAsync(conferenceEvent);
+
+        var conferenceEventsController = new ConferenceEventsController(mockedConferenceEventsService.Object);
+
+        // Act
+        var actionResult = await conferenceEventsController.Put(id!, updatedConferenceEvent);
+
+        // Assert
+        Assert.NotNull(actionResult);
+        Assert.IsType<NoContentResult>(actionResult);
+    }
+
+    [Fact]
+    [Trait("TestCategory", "UnitTest")]
+    public async void Put_Should_Return_Not_Found()
+    {
+        // Arrange
+        var mockedConferenceEventsService = new Mock<IConferenceEventsService>();
+
+        var conferenceEventsController = new ConferenceEventsController(mockedConferenceEventsService.Object);
+
+        // Act
+        var actionResult = await conferenceEventsController.Put("1", new ConferenceEventModel());
+
+        // Assert
+        Assert.NotNull(actionResult);
+
+        Assert.IsType<NotFoundResult>(actionResult);
     }
 }

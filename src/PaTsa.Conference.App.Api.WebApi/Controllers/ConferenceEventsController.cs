@@ -23,6 +23,18 @@ public class ConferenceEventsController : ControllerBase
         _conferenceEventsService = conferenceEventsService;
     }
 
+    [HttpGet("{id:length(24)}")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ConferenceEventModel))]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<ConferenceEventModel>> Get(string id, CancellationToken cancellationToken = default)
+    {
+        var conferenceEvent = await _conferenceEventsService.GetAsync(id, cancellationToken);
+
+        if (conferenceEvent == null) return NotFound();
+
+        return conferenceEvent.ToModel();
+    }
+
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<IList<ConferenceEventModel>>> Get(
@@ -57,5 +69,22 @@ public class ConferenceEventsController : ControllerBase
         conferenceEventModel.Id = conferenceEvent.Id;
 
         return CreatedAtAction(nameof(Get), new { id = conferenceEvent.Id }, conferenceEventModel);
+    }
+
+    [HttpPut("{id:length(24)}")]
+    [ApiKeyAuthorization]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> Put(string id, ConferenceEventModel updatedConferenceEventModel, CancellationToken cancellationToken = default)
+    {
+        var conferenceEvent = await _conferenceEventsService.GetAsync(id, cancellationToken);
+
+        if (conferenceEvent == null) return NotFound();
+
+        updatedConferenceEventModel.Id = conferenceEvent.Id;
+
+        await _conferenceEventsService.UpdateAsync(updatedConferenceEventModel.ToEntity(), cancellationToken);
+
+        return NoContent();
     }
 }
