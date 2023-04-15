@@ -198,7 +198,7 @@ public class ConferenceEventsServiceTest
 
     [Theory]
     [InlineData("Middle School")]
-    [InlineData("Middle School","High School")]
+    [InlineData("Middle School", "High School")]
     [InlineData("Middle School", "Special Interest")]
     [InlineData("Middle School", "High School", "Special Interest")]
     [InlineData("High School", "Special Interest")]
