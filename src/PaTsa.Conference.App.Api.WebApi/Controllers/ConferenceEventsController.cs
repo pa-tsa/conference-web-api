@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using PaTsa.Conference.App.Api.WebApi.Authorization;
@@ -26,9 +25,15 @@ public class ConferenceEventsController : ControllerBase
 
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<ActionResult<IList<ConferenceEventModel>>> Get(int pageNumber = 1, int pageSize = 25, CancellationToken cancellationToken = default)
+    public async Task<ActionResult<IList<ConferenceEventModel>>> Get(
+        string? types,
+        int pageNumber = 1,
+        int pageSize = 25,
+        CancellationToken cancellationToken = default)
     {
-        var entities = await _conferenceEventsService.GetAsync(cancellationToken);
+        var entities = string.IsNullOrWhiteSpace(types)
+            ? await _conferenceEventsService.GetAsync(cancellationToken)
+            : await _conferenceEventsService.FilterAsync(types.Split(','), cancellationToken);
 
         //TODO: Evaluate performance and remediate as necessary
         return entities.Count == 0
@@ -45,10 +50,7 @@ public class ConferenceEventsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status201Created)]
     public async Task<CreatedAtActionResult> Post(ConferenceEventModel conferenceEventModel, CancellationToken cancellationToken = default)
     {
-        var conferenceEvent = conferenceEventModel.ToEntity();
-
-        // TODO: Added to ToEntity method
-        conferenceEvent.Id = null;
+        var conferenceEvent = conferenceEventModel.ToEntity(true);
 
         await _conferenceEventsService.CreateAsync(conferenceEvent, cancellationToken);
 
