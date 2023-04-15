@@ -43,7 +43,7 @@ public class ConferenceEventsControllerTests
         var conferenceEventsController = new ConferenceEventsController(mockedConferenceEventsService.Object);
 
         // Act
-        var actionResult = await conferenceEventsController.Get(pageNumber, pageSize);
+        var actionResult = await conferenceEventsController.Get(null, pageNumber, pageSize);
 
         Assert.NotNull(actionResult);
 
@@ -164,7 +164,7 @@ public class ConferenceEventsControllerTests
         var conferenceEventsController = new ConferenceEventsController(mockedConferenceEventsService.Object);
 
         // Act
-        var actionResult = await conferenceEventsController.Get();
+        var actionResult = await conferenceEventsController.Get(null);
 
         Assert.NotNull(actionResult);
 
@@ -194,7 +194,44 @@ public class ConferenceEventsControllerTests
         var conferenceEventsController = new ConferenceEventsController(mockedConferenceEventsService.Object);
 
         // Act
-        var actionResult = await conferenceEventsController.Get();
+        var actionResult = await conferenceEventsController.Get(null);
+
+        Assert.NotNull(actionResult);
+
+        var conferenceEventModels = actionResult.Value;
+        Assert.NotNull(conferenceEventModels);
+        Assert.NotEmpty(conferenceEventModels);
+        Assert.Equal(25, conferenceEventModels.Count);
+    }
+
+    [Fact]
+    [Trait("TestCategory", "UnitTest")]
+    public async void Get_Should_Return_Ok_With_Default_PageNumber_And_PageSize_When_Filtered()
+    {
+        // Arrange
+        var typesList = new List<string> { "Middle School", "High School", "Special Interest" };
+
+        var types = string.Join(',', typesList);
+
+        var conferenceEventsTestData = new ConferenceEventsTestData();
+
+        var conferenceEvents = conferenceEventsTestData
+            .Where(_ => (ConferenceEventDataIssues)_[1] == ConferenceEventDataIssues.None)
+            .Select(_ => _[0])
+            .Cast<ConferenceEvent>()
+            .ToList();
+
+        Func<IEnumerable<string>, bool> validateFilter = filters => { return filters.All(filter => typesList.Contains(filter)); };
+
+        var mockedConferenceEventsService = new Mock<IConferenceEventsService>();
+        mockedConferenceEventsService
+            .Setup(_ => _.FilterAsync(It.Is<IEnumerable<string>>(f => validateFilter(f)), default))
+            .ReturnsAsync(conferenceEvents);
+
+        var conferenceEventsController = new ConferenceEventsController(mockedConferenceEventsService.Object);
+
+        // Act
+        var actionResult = await conferenceEventsController.Get(types);
 
         Assert.NotNull(actionResult);
 
@@ -238,7 +275,7 @@ public class ConferenceEventsControllerTests
         var conferenceEventsController = new ConferenceEventsController(mockedConferenceEventsService.Object);
 
         // Act
-        var actionResult = await conferenceEventsController.Get(pageNumber, pageSize);
+        var actionResult = await conferenceEventsController.Get(null, pageNumber, pageSize);
 
         Assert.NotNull(actionResult);
 
