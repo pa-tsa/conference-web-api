@@ -12,6 +12,7 @@ public static class EntityExtensions
         {
             Description = conferenceEvent.Description,
             EndDateTime = conferenceEvent.EndDateTime,
+            EventId = conferenceEvent.EventId,
             Id = conferenceEvent.Id,
             Location = conferenceEvent.Location,
             Name = conferenceEvent.Name,

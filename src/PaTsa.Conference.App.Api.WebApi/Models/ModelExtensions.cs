@@ -10,6 +10,7 @@ public static class ModelExtensions
         {
             Description = conferenceEventModel.Description,
             EndDateTime = conferenceEventModel.EndDateTime,
+            EventId = conferenceEventModel.EventId,
             Id = ignoreId ? null : conferenceEventModel.Id,
             Location = conferenceEventModel.Location,
             Name = conferenceEventModel.Name,

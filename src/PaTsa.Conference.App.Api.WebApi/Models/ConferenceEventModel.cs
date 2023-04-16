@@ -8,6 +8,8 @@ public class ConferenceEventModel
 
     public DateTime EndDateTime { get; set; }
 
+    public string? EventId { get; set; }
+
     public string? Id { get; set; }
 
     public string? Location { get; set; }
