@@ -270,7 +270,7 @@ public class ConferenceEventsServiceTest
         var conferenceEventsService = new ConferenceEventsService(mockedMongoClient.Object, mockedPointOfSalesOptions.Object);
 
         // Act
-        var result = await conferenceEventsService.FilterAsync(types);
+        var result = await conferenceEventsService.FilterAsync(new List<string>(), types);
 
         // Assert
         Assert.NotNull(result);

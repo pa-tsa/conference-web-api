@@ -30,7 +30,7 @@ public class ConferenceEventsControllerTests
         var conferenceEventsTestData = new ConferenceEventsTestData();
 
         var conferenceEvents = conferenceEventsTestData
-            .Where(_ => (ConferenceEventDataIssues)_[1] == ConferenceEventDataIssues.None)
+            .Where(_ => (ConferenceEventDataIssues) _[1] == ConferenceEventDataIssues.None)
             .Select(_ => _[0])
             .Cast<ConferenceEvent>()
             .Take(take)
@@ -44,7 +44,7 @@ public class ConferenceEventsControllerTests
         var conferenceEventsController = new ConferenceEventsController(mockedConferenceEventsService.Object);
 
         // Act
-        var actionResult = await conferenceEventsController.Get(null, pageNumber, pageSize);
+        var actionResult = await conferenceEventsController.Get(null, null, pageNumber, pageSize);
 
         Assert.NotNull(actionResult);
 
@@ -115,7 +115,7 @@ public class ConferenceEventsControllerTests
         Assert.NotEmpty(attributes);
         Assert.Single(attributes);
 
-        var producesAttribute = (ProducesAttribute)attributes[0];
+        var producesAttribute = (ProducesAttribute) attributes[0];
 
         Assert.Contains("application/json", producesAttribute.ContentTypes);
     }
@@ -132,7 +132,7 @@ public class ConferenceEventsControllerTests
         Assert.NotEmpty(attributes);
         Assert.Single(attributes);
 
-        var routeAttribute = (RouteAttribute)attributes[0];
+        var routeAttribute = (RouteAttribute) attributes[0];
 
         Assert.Equal("api/[controller]", routeAttribute.Template);
     }
@@ -147,7 +147,7 @@ public class ConferenceEventsControllerTests
         var conferenceEventsController = new ConferenceEventsController(mockedConferenceEventsService.Object);
 
         // Act
-        var actionResult = await conferenceEventsController.Get(id: "1");
+        var actionResult = await conferenceEventsController.Get("1");
 
         // Assert
         Assert.NotNull(actionResult.Result);
@@ -163,7 +163,7 @@ public class ConferenceEventsControllerTests
         var conferenceEventsTestData = new ConferenceEventsTestData();
 
         var conferenceEvent =
-            conferenceEventsTestData.First(_ => (ConferenceEventDataIssues)_[1] == ConferenceEventDataIssues.None)[0] as ConferenceEvent;
+            conferenceEventsTestData.First(_ => (ConferenceEventDataIssues) _[1] == ConferenceEventDataIssues.None)[0] as ConferenceEvent;
 
         var id = conferenceEvent!.Id;
 
@@ -175,7 +175,7 @@ public class ConferenceEventsControllerTests
         var conferenceEventsController = new ConferenceEventsController(mockedConferenceEventsService.Object);
 
         // Act
-        var actionResult = await conferenceEventsController.Get(id: id!);
+        var actionResult = await conferenceEventsController.Get(id!);
 
         Assert.NotNull(actionResult);
         Assert.NotNull(actionResult.Value);
@@ -195,7 +195,7 @@ public class ConferenceEventsControllerTests
         var conferenceEventsController = new ConferenceEventsController(mockedConferenceEventsService.Object);
 
         // Act
-        var actionResult = await conferenceEventsController.Get(types: null);
+        var actionResult = await conferenceEventsController.Get(null, null);
 
         Assert.NotNull(actionResult);
 
@@ -212,7 +212,7 @@ public class ConferenceEventsControllerTests
         var conferenceEventsTestData = new ConferenceEventsTestData();
 
         var conferenceEvents = conferenceEventsTestData
-            .Where(_ => (ConferenceEventDataIssues)_[1] == ConferenceEventDataIssues.None)
+            .Where(_ => (ConferenceEventDataIssues) _[1] == ConferenceEventDataIssues.None)
             .Select(_ => _[0])
             .Cast<ConferenceEvent>()
             .ToList();
@@ -225,7 +225,7 @@ public class ConferenceEventsControllerTests
         var conferenceEventsController = new ConferenceEventsController(mockedConferenceEventsService.Object);
 
         // Act
-        var actionResult = await conferenceEventsController.Get(types: null);
+        var actionResult = await conferenceEventsController.Get(null, null);
 
         Assert.NotNull(actionResult);
 
@@ -247,22 +247,25 @@ public class ConferenceEventsControllerTests
         var conferenceEventsTestData = new ConferenceEventsTestData();
 
         var conferenceEvents = conferenceEventsTestData
-            .Where(_ => (ConferenceEventDataIssues)_[1] == ConferenceEventDataIssues.None)
+            .Where(_ => (ConferenceEventDataIssues) _[1] == ConferenceEventDataIssues.None)
             .Select(_ => _[0])
             .Cast<ConferenceEvent>()
             .ToList();
-
-        Func<IEnumerable<string>, bool> validateFilter = filters => { return filters.All(filter => typesList.Contains(filter)); };
+        Func<IEnumerable<string>, bool> validateEventIdsFilter = filters => !filters.Any();
+        Func<IEnumerable<string>, bool> validateTypeFilter = filters => filters.All(filter => typesList.Contains(filter));
 
         var mockedConferenceEventsService = new Mock<IConferenceEventsService>();
         mockedConferenceEventsService
-            .Setup(_ => _.FilterAsync(It.Is<IEnumerable<string>>(f => validateFilter(f)), default))
+            .Setup(_ => _.FilterAsync(
+                It.Is<IEnumerable<string>>(f => validateEventIdsFilter(f)),
+                It.Is<IEnumerable<string>>(f => validateTypeFilter(f)),
+                default))
             .ReturnsAsync(conferenceEvents);
 
         var conferenceEventsController = new ConferenceEventsController(mockedConferenceEventsService.Object);
 
         // Act
-        var actionResult = await conferenceEventsController.Get(types: types);
+        var actionResult = await conferenceEventsController.Get(null, types);
 
         Assert.NotNull(actionResult);
 
@@ -283,7 +286,7 @@ public class ConferenceEventsControllerTests
         const int pageSize = 20;
 
         var conferenceEvents = conferenceEventsTestData
-            .Where(_ => (ConferenceEventDataIssues)_[1] == ConferenceEventDataIssues.None)
+            .Where(_ => (ConferenceEventDataIssues) _[1] == ConferenceEventDataIssues.None)
             .Select(_ => _[0])
             .Cast<ConferenceEvent>()
             .ToList();
@@ -306,7 +309,7 @@ public class ConferenceEventsControllerTests
         var conferenceEventsController = new ConferenceEventsController(mockedConferenceEventsService.Object);
 
         // Act
-        var actionResult = await conferenceEventsController.Get(null, pageNumber, pageSize);
+        var actionResult = await conferenceEventsController.Get(null, null, pageNumber, pageSize);
 
         Assert.NotNull(actionResult);
 
@@ -322,7 +325,8 @@ public class ConferenceEventsControllerTests
         // Arrange
         var conferenceEventsTestData = new ConferenceEventsTestData();
 
-        var conferenceEvent = (ConferenceEvent)conferenceEventsTestData.First(_ => (ConferenceEventDataIssues)_[1] == ConferenceEventDataIssues.None)[0];
+        var conferenceEvent =
+            (ConferenceEvent) conferenceEventsTestData.First(_ => (ConferenceEventDataIssues) _[1] == ConferenceEventDataIssues.None)[0];
 
         conferenceEvent.Id = null;
 
@@ -350,7 +354,8 @@ public class ConferenceEventsControllerTests
         // Arrange
         var conferenceEventsTestData = new ConferenceEventsTestData();
 
-        var conferenceEvent = (ConferenceEvent)conferenceEventsTestData.First(_ => (ConferenceEventDataIssues)_[1] == ConferenceEventDataIssues.None)[0];
+        var conferenceEvent =
+            (ConferenceEvent) conferenceEventsTestData.First(_ => (ConferenceEventDataIssues) _[1] == ConferenceEventDataIssues.None)[0];
 
         var updatedConferenceEvent = new ConferenceEventModel
         {
