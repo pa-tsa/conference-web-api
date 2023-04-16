@@ -10,6 +10,8 @@ public class ConferenceEvent : IMongoDbEntity
 
     public DateTime EndDateTime { get; set; }
 
+    public string? EventId { get; set; }
+
     [BsonId]
     [BsonRepresentation(BsonType.ObjectId)]
     public string? Id { get; set; }
