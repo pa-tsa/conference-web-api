@@ -23,13 +23,36 @@ public class ConferenceEventsService : MongoDbService<ConferenceEvent>, IConfere
         MongoDbCollectionName)
     { }
 
-    public async Task<List<ConferenceEvent>> FilterAsync(IEnumerable<string> types, CancellationToken cancellationToken = default)
+    public async Task<List<ConferenceEvent>> FilterAsync(
+        IEnumerable<string> eventIds,
+        IEnumerable<string> types,
+        CancellationToken cancellationToken = default)
     {
-        var eventTypes = types.Select(type => Builders<ConferenceEvent>.Filter.Eq(_ => _.Type, type)).ToList();
+        var eventIdsFilterDefinitionList = eventIds
+            .Select(eventId => Builders<ConferenceEvent>.Filter.Eq(_ => _.EventId, eventId))
+            .ToList();
 
-        var filterDefinitions = Builders<ConferenceEvent>.Filter.Or(eventTypes);
+        var eventTypesFilterDefinitionList = types
+            .Select(type => Builders<ConferenceEvent>.Filter.Eq(_ => _.Type, type))
+            .ToList();
 
-        var cursor = await EntityCollection.FindAsync(filterDefinitions, null, cancellationToken);
+        var filterDefinition = FilterDefinition<ConferenceEvent>.Empty;
+
+        if (eventIdsFilterDefinitionList.Any())
+        {
+            filterDefinition = Builders<ConferenceEvent>.Filter.Or(eventIdsFilterDefinitionList);
+        }
+
+        if (eventTypesFilterDefinitionList.Any())
+        {
+            filterDefinition = filterDefinition == FilterDefinition<ConferenceEvent>.Empty
+                ? Builders<ConferenceEvent>.Filter.Or(eventTypesFilterDefinitionList)
+                : Builders<ConferenceEvent>.Filter.And(
+                    filterDefinition,
+                    Builders<ConferenceEvent>.Filter.Or(eventTypesFilterDefinitionList));
+        }
+
+        var cursor = await EntityCollection.FindAsync(filterDefinition, null, cancellationToken);
 
         var result = await cursor.ToListAsync(cancellationToken);
 

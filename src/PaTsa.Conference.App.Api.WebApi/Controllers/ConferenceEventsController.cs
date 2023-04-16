@@ -38,14 +38,17 @@ public class ConferenceEventsController : ControllerBase
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<IList<ConferenceEventModel>>> Get(
+        string? eventIds,
         string? types,
         int pageNumber = 1,
         int pageSize = 25,
         CancellationToken cancellationToken = default)
     {
-        var entities = string.IsNullOrWhiteSpace(types)
+        var entities = string.IsNullOrWhiteSpace(eventIds) && string.IsNullOrWhiteSpace(types)
             ? await _conferenceEventsService.GetAsync(cancellationToken)
-            : await _conferenceEventsService.FilterAsync(types.Split(','), cancellationToken);
+            : await _conferenceEventsService.FilterAsync(
+                string.IsNullOrWhiteSpace(eventIds) ? new List<string>(0) : eventIds.Split(','),
+                string.IsNullOrWhiteSpace(types) ? new List<string>(0) : types.Split(','), cancellationToken);
 
         //TODO: Evaluate performance and remediate as necessary
         return entities.Count == 0
