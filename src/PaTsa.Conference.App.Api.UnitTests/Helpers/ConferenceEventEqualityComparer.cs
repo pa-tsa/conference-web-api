@@ -16,6 +16,7 @@ internal class ConferenceEventEqualityComparer : IEqualityComparer<ConferenceEve
 
         var descriptionsMatch = x.Description == y.Description;
         var endDateTimesMatch = x.EndDateTime == y.EndDateTime;
+        var eventIdsMatch = x.EventId == y.EventId;
         var idsMatch = x.Id == y.Id;
         var locationsMatch = x.Location == y.Location;
         var namesMatch = x.Name == y.Name;
@@ -24,6 +25,7 @@ internal class ConferenceEventEqualityComparer : IEqualityComparer<ConferenceEve
 
         return descriptionsMatch &&
                endDateTimesMatch &&
+               eventIdsMatch &&
                idsMatch &&
                locationsMatch &&
                namesMatch &&
