@@ -20,7 +20,8 @@ public class ConferenceEventsService : MongoDbService<ConferenceEvent>, IConfere
     public ConferenceEventsService(IMongoClient mongoClient, IOptions<ConferenceDatabase> options) : base(
         mongoClient,
         options.Value.DatabaseName,
-        MongoDbCollectionName) { }
+        MongoDbCollectionName)
+    { }
 
     public async Task<List<ConferenceEvent>> FilterAsync(
         IEnumerable<string> eventIds,

@@ -30,7 +30,7 @@ public class ConferenceEventsControllerTests
         var conferenceEventsTestData = new ConferenceEventsTestData();
 
         var conferenceEvents = conferenceEventsTestData
-            .Where(_ => (ConferenceEventDataIssues) _[1] == ConferenceEventDataIssues.None)
+            .Where(_ => (ConferenceEventDataIssues)_[1] == ConferenceEventDataIssues.None)
             .Select(_ => _[0])
             .Cast<ConferenceEvent>()
             .Take(take)
@@ -115,7 +115,7 @@ public class ConferenceEventsControllerTests
         Assert.NotEmpty(attributes);
         Assert.Single(attributes);
 
-        var producesAttribute = (ProducesAttribute) attributes[0];
+        var producesAttribute = (ProducesAttribute)attributes[0];
 
         Assert.Contains("application/json", producesAttribute.ContentTypes);
     }
@@ -132,7 +132,7 @@ public class ConferenceEventsControllerTests
         Assert.NotEmpty(attributes);
         Assert.Single(attributes);
 
-        var routeAttribute = (RouteAttribute) attributes[0];
+        var routeAttribute = (RouteAttribute)attributes[0];
 
         Assert.Equal("api/[controller]", routeAttribute.Template);
     }
@@ -163,7 +163,7 @@ public class ConferenceEventsControllerTests
         var conferenceEventsTestData = new ConferenceEventsTestData();
 
         var conferenceEvent =
-            conferenceEventsTestData.First(_ => (ConferenceEventDataIssues) _[1] == ConferenceEventDataIssues.None)[0] as ConferenceEvent;
+            conferenceEventsTestData.First(_ => (ConferenceEventDataIssues)_[1] == ConferenceEventDataIssues.None)[0] as ConferenceEvent;
 
         var id = conferenceEvent!.Id;
 
@@ -212,7 +212,7 @@ public class ConferenceEventsControllerTests
         var conferenceEventsTestData = new ConferenceEventsTestData();
 
         var conferenceEvents = conferenceEventsTestData
-            .Where(_ => (ConferenceEventDataIssues) _[1] == ConferenceEventDataIssues.None)
+            .Where(_ => (ConferenceEventDataIssues)_[1] == ConferenceEventDataIssues.None)
             .Select(_ => _[0])
             .Cast<ConferenceEvent>()
             .ToList();
@@ -247,7 +247,7 @@ public class ConferenceEventsControllerTests
         var conferenceEventsTestData = new ConferenceEventsTestData();
 
         var conferenceEvents = conferenceEventsTestData
-            .Where(_ => (ConferenceEventDataIssues) _[1] == ConferenceEventDataIssues.None)
+            .Where(_ => (ConferenceEventDataIssues)_[1] == ConferenceEventDataIssues.None)
             .Select(_ => _[0])
             .Cast<ConferenceEvent>()
             .ToList();
@@ -286,7 +286,7 @@ public class ConferenceEventsControllerTests
         const int pageSize = 20;
 
         var conferenceEvents = conferenceEventsTestData
-            .Where(_ => (ConferenceEventDataIssues) _[1] == ConferenceEventDataIssues.None)
+            .Where(_ => (ConferenceEventDataIssues)_[1] == ConferenceEventDataIssues.None)
             .Select(_ => _[0])
             .Cast<ConferenceEvent>()
             .ToList();
@@ -326,7 +326,7 @@ public class ConferenceEventsControllerTests
         var conferenceEventsTestData = new ConferenceEventsTestData();
 
         var conferenceEvent =
-            (ConferenceEvent) conferenceEventsTestData.First(_ => (ConferenceEventDataIssues) _[1] == ConferenceEventDataIssues.None)[0];
+            (ConferenceEvent)conferenceEventsTestData.First(_ => (ConferenceEventDataIssues)_[1] == ConferenceEventDataIssues.None)[0];
 
         conferenceEvent.Id = null;
 
@@ -355,7 +355,7 @@ public class ConferenceEventsControllerTests
         var conferenceEventsTestData = new ConferenceEventsTestData();
 
         var conferenceEvent =
-            (ConferenceEvent) conferenceEventsTestData.First(_ => (ConferenceEventDataIssues) _[1] == ConferenceEventDataIssues.None)[0];
+            (ConferenceEvent)conferenceEventsTestData.First(_ => (ConferenceEventDataIssues)_[1] == ConferenceEventDataIssues.None)[0];
 
         var updatedConferenceEvent = new ConferenceEventModel
         {
