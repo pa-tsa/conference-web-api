@@ -24,15 +24,16 @@ jobs:
     secrets: inherit
 
   # TODO: Make this a deploy job and deploy to production
-  terraformApplyJob:
-    name: CD - Terraform Apply Workflow
-    needs: gitVersionJob
-    uses: ./.github/workflows/terraform-apply-reusable-workflow.yml
-    secrets: inherit
+  # terraformApplyJob:
+  #   name: CD - Terraform Apply Workflow
+  #   needs: gitVersionJob
+  #   uses: ./.github/workflows/terraform-apply-reusable-workflow.yml
+  #   secrets: inherit
 
   deployApplicationJob:
     name: CD - Deploy Workflow
-    needs: [buildApplicationJob, terraformApplyJob]
+    # needs: [buildApplicationJob, terraformApplyJob]
+    needs: [buildApplicationJob]
     uses: ./.github/workflows/deploy-reusable-workflow.yml
     with:
       azureAppName: pa-tsa-conference-app-api-app
