@@ -31,21 +31,21 @@ public class ConferenceEventsService : MongoDbService<ConferenceEvent>, IConfere
         CancellationToken cancellationToken = default)
     {
         var eventIdsFilterDefinitionList = eventIds
-            .Select(eventId => Builders<ConferenceEvent>.Filter.Eq(_ => _.EventId, eventId))
+            .Select(eventId => Builders<ConferenceEvent>.Filter.Eq(conferenceEvent => conferenceEvent.EventId, eventId))
             .ToList();
 
         var eventTypesFilterDefinitionList = types
-            .Select(type => Builders<ConferenceEvent>.Filter.Eq(_ => _.Type, type))
+            .Select(type => Builders<ConferenceEvent>.Filter.Eq(conferenceEvent => conferenceEvent.Type, type))
             .ToList();
 
         var filterDefinition = FilterDefinition<ConferenceEvent>.Empty;
 
-        if (eventIdsFilterDefinitionList.Any())
+        if (eventIdsFilterDefinitionList.Count != 0)
         {
             filterDefinition = Builders<ConferenceEvent>.Filter.Or(eventIdsFilterDefinitionList);
         }
 
-        if (eventTypesFilterDefinitionList.Any())
+        if (eventTypesFilterDefinitionList.Count != 0)
         {
             filterDefinition = filterDefinition == FilterDefinition<ConferenceEvent>.Empty
                 ? Builders<ConferenceEvent>.Filter.Or(eventTypesFilterDefinitionList)
