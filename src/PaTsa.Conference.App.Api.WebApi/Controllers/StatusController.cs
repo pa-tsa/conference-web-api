@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Threading;
 using System;
+using Amazon.Runtime.Internal.Util;
+using Microsoft.Extensions.Logging;
 using PaTsa.Conference.App.Api.WebApi.Models;
 using PaTsa.Conference.App.Api.WebApi.Services;
 
@@ -16,10 +18,12 @@ namespace PaTsa.Conference.App.Api.WebApi.Controllers
     [Produces("application/json")]
     public class StatusController : ControllerBase
     {
+        private readonly ILogger<StatusController> _logger;
         private readonly List<IPingableService> _pingableServices = new();
 
-        public StatusController(IEnumerable<IPingableService> pingableServices)
+        public StatusController(IEnumerable<IPingableService> pingableServices, ILogger<StatusController> logger)
         {
+            _logger = logger;
             _pingableServices.AddRange(pingableServices);
         }
 
@@ -29,27 +33,28 @@ namespace PaTsa.Conference.App.Api.WebApi.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<ServicesStatusModel>> Get(CancellationToken cancellationToken = default)
         {
-            var concurrentBag = new ConcurrentBag<Tuple<string, bool>>();
+            var servicePingResultsList = new List<Tuple<string, bool>>();
 
-            await Parallel.ForEachAsync(_pingableServices, cancellationToken, async (pingableService, pingCancellationToken) =>
+            foreach (var pingableService in _pingableServices)
             {
                 bool isAlive;
                 try
                 {
-                    isAlive = await pingableService.PingAsync(pingCancellationToken);
+                    isAlive = await pingableService.PingAsync(cancellationToken);
                 }
-                catch (Exception)
+                catch (Exception exception)
                 {
                     isAlive = false;
+                    _logger.LogError(exception, "Unknown failure while attempting to check status");
                 }
 
-                concurrentBag.Add(new Tuple<string, bool>(pingableService.ServiceName, isAlive));
-            });
+                servicePingResultsList.Add(new Tuple<string, bool>(pingableService.ServiceName, isAlive));
+            }
 
             var servicesStatusModelType = typeof(ServicesStatusModel);
             var servicesStatusModel = new ServicesStatusModel();
 
-            foreach (var tuple in concurrentBag)
+            foreach (var tuple in servicePingResultsList)
             {
                 var propertyInfo = servicesStatusModelType.GetProperty($"{tuple.Item1}ServiceIsAlive");
 

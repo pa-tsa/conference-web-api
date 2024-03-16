@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Threading;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Moq;
 using PaTsa.Conference.App.Api.WebApi.Controllers;
 using PaTsa.Conference.App.Api.WebApi.Models;
@@ -15,6 +16,8 @@ namespace PaTsa.Conference.App.Api.UnitTests.WebApi.Controllers;
 [ExcludeFromCodeCoverage]
 public class StatusControllerTests
 {
+    private readonly Mock<ILogger<StatusController>> _loggerMock = new();
+
     private static void AssertServiceStatus(ServicesStatusModel servicesStatusModel, PingableServiceFailures pingableServiceFailures)
     {
         Assert.Equal(servicesStatusModel.ConferenceEventsServiceIsAlive, !pingableServiceFailures.HasFlag(PingableServiceFailures.ConferenceEvents));
@@ -104,7 +107,7 @@ public class StatusControllerTests
         // Arrange
         var pingableServices = BuildUnhealthyPingableServices(pingableServiceFailures, ServiceFailureType.PingFailed);
 
-        var statusController = new StatusController(pingableServices);
+        var statusController = new StatusController(pingableServices, _loggerMock.Object);
 
         // Act
         var actionResult = await statusController.Get();
@@ -140,7 +143,7 @@ public class StatusControllerTests
         // Arrange
         var pingableServices = BuildUnhealthyPingableServices(pingableServiceFailures, ServiceFailureType.ExceptionThrown);
 
-        var statusController = new StatusController(pingableServices);
+        var statusController = new StatusController(pingableServices, _loggerMock.Object);
 
         // Act
         var actionResult = await statusController.Get();
@@ -273,7 +276,7 @@ public class StatusControllerTests
         // Arrange
         var pingableServices = BuildHealthyPingableServices();
 
-        var statusController = new StatusController(pingableServices);
+        var statusController = new StatusController(pingableServices, _loggerMock.Object);
 
         // Act
         var actionResult = await statusController.Get();
@@ -310,7 +313,7 @@ public class StatusControllerTests
 
         pingableServices.Add(mockedUnknownService.Object);
 
-        var statusController = new StatusController(pingableServices);
+        var statusController = new StatusController(pingableServices, _loggerMock.Object);
 
         // Act
         var actionResult = await statusController.Get();
