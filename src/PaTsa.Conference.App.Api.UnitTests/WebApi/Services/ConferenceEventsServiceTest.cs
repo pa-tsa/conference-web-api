@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using Moq;
@@ -21,6 +22,8 @@ public class ConferenceEventsServiceTest
 {
     private const string CollectionName = "conference-events";
     private const string DatabaseName = "conference-app-cosmosdb";
+
+    private readonly Mock<ILogger<ConferenceEventsService>> _loggerMock = new();
 
     [Fact]
     [Trait("TestCategory", "UnitTest")]
@@ -48,7 +51,7 @@ public class ConferenceEventsServiceTest
             });
 
         // Act
-        var conferenceEventsService = new ConferenceEventsService(mockedMongoClient.Object, mockedPointOfSalesOptions.Object);
+        var conferenceEventsService = new ConferenceEventsService(mockedMongoClient.Object, mockedPointOfSalesOptions.Object, _loggerMock.Object);
 
         // Assert
         Assert.Equal("conference-events", conferenceEventsService.CollectionName);
@@ -80,7 +83,7 @@ public class ConferenceEventsServiceTest
             });
 
         // Act
-        var conferenceEventsService = new ConferenceEventsService(mockedMongoClient.Object, mockedPointOfSalesOptions.Object);
+        var conferenceEventsService = new ConferenceEventsService(mockedMongoClient.Object, mockedPointOfSalesOptions.Object, _loggerMock.Object);
 
         // Assert
         Assert.NotNull(conferenceEventsService);
@@ -118,7 +121,7 @@ public class ConferenceEventsServiceTest
                 DatabaseName = DatabaseName
             });
 
-        var conferenceEventsService = new ConferenceEventsService(mockedMongoClient.Object, mockedPointOfSalesOptions.Object);
+        var conferenceEventsService = new ConferenceEventsService(mockedMongoClient.Object, mockedPointOfSalesOptions.Object, _loggerMock.Object);
 
         // Act
         await conferenceEventsService.CreateAsync(conferenceEvent!);
@@ -187,7 +190,7 @@ public class ConferenceEventsServiceTest
                 DatabaseName = DatabaseName
             });
 
-        var conferenceEventsService = new ConferenceEventsService(mockedMongoClient.Object, mockedPointOfSalesOptions.Object);
+        var conferenceEventsService = new ConferenceEventsService(mockedMongoClient.Object, mockedPointOfSalesOptions.Object, _loggerMock.Object);
 
         // Act
         var result = await conferenceEventsService.ExistsAsync(expectedConferenceEvent.Id!);
@@ -267,7 +270,7 @@ public class ConferenceEventsServiceTest
                 DatabaseName = DatabaseName
             });
 
-        var conferenceEventsService = new ConferenceEventsService(mockedMongoClient.Object, mockedPointOfSalesOptions.Object);
+        var conferenceEventsService = new ConferenceEventsService(mockedMongoClient.Object, mockedPointOfSalesOptions.Object, _loggerMock.Object);
 
         // Act
         var result = await conferenceEventsService.FilterAsync(new List<string>(), types);
@@ -329,7 +332,7 @@ public class ConferenceEventsServiceTest
                 DatabaseName = DatabaseName
             });
 
-        var conferenceEventsService = new ConferenceEventsService(mockedMongoClient.Object, mockedPointOfSalesOptions.Object);
+        var conferenceEventsService = new ConferenceEventsService(mockedMongoClient.Object, mockedPointOfSalesOptions.Object, _loggerMock.Object);
 
         // Act
         var result = await conferenceEventsService.GetAsync();
@@ -399,7 +402,7 @@ public class ConferenceEventsServiceTest
                 DatabaseName = DatabaseName
             });
 
-        var conferenceEventsService = new ConferenceEventsService(mockedMongoClient.Object, mockedPointOfSalesOptions.Object);
+        var conferenceEventsService = new ConferenceEventsService(mockedMongoClient.Object, mockedPointOfSalesOptions.Object, _loggerMock.Object);
 
         // Act
         var result = await conferenceEventsService.GetAsync(expectedConferenceEvent.Id!);
@@ -464,7 +467,7 @@ public class ConferenceEventsServiceTest
                 DatabaseName = DatabaseName
             });
 
-        var conferenceEventsService = new ConferenceEventsService(mockedMongoClient.Object, mockedPointOfSalesOptions.Object);
+        var conferenceEventsService = new ConferenceEventsService(mockedMongoClient.Object, mockedPointOfSalesOptions.Object, _loggerMock.Object);
 
         // Act
         var result = await conferenceEventsService.GetAsync(ids);
@@ -497,7 +500,7 @@ public class ConferenceEventsServiceTest
                 DatabaseName = DatabaseName
             });
 
-        var conferenceEventsService = new ConferenceEventsService(mockedMongoClient.Object, mockedPointOfSalesOptions.Object);
+        var conferenceEventsService = new ConferenceEventsService(mockedMongoClient.Object, mockedPointOfSalesOptions.Object, _loggerMock.Object);
 
         // Act
         var result = await conferenceEventsService.PingAsync();
@@ -536,7 +539,7 @@ public class ConferenceEventsServiceTest
                 DatabaseName = DatabaseName
             });
 
-        var conferenceEventsService = new ConferenceEventsService(mockedMongoClient.Object, mockedPointOfSalesOptions.Object);
+        var conferenceEventsService = new ConferenceEventsService(mockedMongoClient.Object, mockedPointOfSalesOptions.Object, _loggerMock.Object);
 
         // Act
         var result = await conferenceEventsService.PingAsync();
@@ -591,7 +594,7 @@ public class ConferenceEventsServiceTest
                 DatabaseName = DatabaseName
             });
 
-        var conferenceEventsService = new ConferenceEventsService(mockedMongoClient.Object, mockedPointOfSalesOptions.Object);
+        var conferenceEventsService = new ConferenceEventsService(mockedMongoClient.Object, mockedPointOfSalesOptions.Object, _loggerMock.Object);
 
         // Act
         await conferenceEventsService.RemoveAsync(expectedConferenceEvent);
@@ -631,7 +634,7 @@ public class ConferenceEventsServiceTest
             });
 
         // Act
-        var conferenceEventsService = new ConferenceEventsService(mockedMongoClient.Object, mockedPointOfSalesOptions.Object);
+        var conferenceEventsService = new ConferenceEventsService(mockedMongoClient.Object, mockedPointOfSalesOptions.Object, _loggerMock.Object);
 
         // Assert
         Assert.Equal("ConferenceEvents", conferenceEventsService.ServiceName);
@@ -680,7 +683,7 @@ public class ConferenceEventsServiceTest
                 DatabaseName = DatabaseName
             });
 
-        var conferenceEventsService = new ConferenceEventsService(mockedMongoClient.Object, mockedPointOfSalesOptions.Object);
+        var conferenceEventsService = new ConferenceEventsService(mockedMongoClient.Object, mockedPointOfSalesOptions.Object, _loggerMock.Object);
 
         // Act
         await conferenceEventsService.UpdateAsync(expectedConferenceEvent, default);

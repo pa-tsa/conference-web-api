@@ -2,21 +2,24 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using PaTsa.Conference.App.Api.WebApi.Entities;
+using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace PaTsa.Conference.App.Api.WebApi.Services;
 
 public abstract class MongoDbService<T> where T : IMongoDbEntity
 {
     protected IMongoCollection<T> EntityCollection;
+    protected ILogger Logger;
     protected IMongoDatabase MongoDatabase;
 
-    protected MongoDbService(IMongoClient mongoClient, string databaseName, string collectionName)
+    protected MongoDbService(IMongoClient mongoClient, string databaseName, string collectionName, ILogger<MongoDbService<T>> logger)
     {
         MongoDatabase = mongoClient.GetDatabase(databaseName);
-
+        Logger = logger;
         EntityCollection = MongoDatabase.GetCollection<T>(collectionName);
     }
 
@@ -73,9 +76,10 @@ public abstract class MongoDbService<T> where T : IMongoDbEntity
         {
             await EntityCollection.Database.RunCommandAsync((Command<BsonDocument>)"{ping:1}", cancellationToken: cancellationToken);
         }
-        catch (Exception)
+        catch (Exception exception)
         {
             successful = false;
+            Logger.LogError(exception, "Error while attempting to ping MongoDB instance");
         }
 
         return successful;

@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using PaTsa.Conference.App.Api.WebApi.Configuration;
@@ -17,10 +18,11 @@ public class ConferenceEventsService : MongoDbService<ConferenceEvent>, IConfere
 
     public string ServiceName => "ConferenceEvents";
 
-    public ConferenceEventsService(IMongoClient mongoClient, IOptions<ConferenceDatabase> options) : base(
+    public ConferenceEventsService(IMongoClient mongoClient, IOptions<ConferenceDatabase> options, ILogger<ConferenceEventsService> logger) : base(
         mongoClient,
         options.Value.DatabaseName,
-        MongoDbCollectionName)
+        MongoDbCollectionName,
+        logger)
     { }
 
     public async Task<List<ConferenceEvent>> FilterAsync(
