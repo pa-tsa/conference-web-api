@@ -23,7 +23,7 @@ public class StatusControllerTests
         Assert.Equal(servicesStatusModel.ConferenceEventsServiceIsAlive, !pingableServiceFailures.HasFlag(PingableServiceFailures.ConferenceEvents));
     }
 
-    private static IList<IPingableService> BuildHealthyPingableServices()
+    private static List<IPingableService> BuildHealthyPingableServices()
     {
         var pingableServices = new List<IPingableService>();
 
@@ -32,11 +32,11 @@ public class StatusControllerTests
             var mockedPingableService = new Mock<IPingableService>();
 
             mockedPingableService
-                .Setup(_ => _.PingAsync(It.IsAny<CancellationToken>()))
+                .Setup(pingableService => pingableService.PingAsync(It.IsAny<CancellationToken>()))
                 .ReturnsAsync(true);
 
             mockedPingableService
-                .Setup(_ => _.ServiceName)
+                .Setup(pingableService => pingableService.ServiceName)
                 .Returns(serviceType.Name.Replace("Service", string.Empty));
 
             pingableServices.Add(mockedPingableService.Object);
@@ -45,10 +45,10 @@ public class StatusControllerTests
         return pingableServices;
     }
 
-    private static IList<IPingableService> BuildUnhealthyPingableServices(PingableServiceFailures pingableServiceFailures,
+    private static IEnumerable<IPingableService> BuildUnhealthyPingableServices(
+        PingableServiceFailures pingableServiceFailures,
         ServiceFailureType serviceFailureType)
     {
-        var pingableServices = new List<IPingableService>();
 
         foreach (var serviceType in GetServiceTypes())
         {
@@ -59,7 +59,7 @@ public class StatusControllerTests
             var mockedPingableService = new Mock<IPingableService>();
 
             mockedPingableService
-                .Setup(_ => _.ServiceName)
+                .Setup(pingableService => pingableService.ServiceName)
                 .Returns(serviceName);
 
             if (pingableServiceFailures.HasFlag(pingableServiceFailureFlag))
@@ -68,12 +68,12 @@ public class StatusControllerTests
                 {
                     case ServiceFailureType.ExceptionThrown:
                         mockedPingableService
-                            .Setup(_ => _.PingAsync(It.IsAny<CancellationToken>()))
+                            .Setup(pingableService => pingableService.PingAsync(It.IsAny<CancellationToken>()))
                             .Throws(new Exception("Test handling exceptions"));
                         break;
 
                     case ServiceFailureType.PingFailed:
-                        mockedPingableService.Setup(_ => _.PingAsync(It.IsAny<CancellationToken>()))
+                        mockedPingableService.Setup(pingableService => pingableService.PingAsync(It.IsAny<CancellationToken>()))
                             .ReturnsAsync(false);
                         break;
                 }
@@ -81,14 +81,12 @@ public class StatusControllerTests
             else
             {
                 mockedPingableService
-                    .Setup(_ => _.PingAsync(It.IsAny<CancellationToken>()))
+                    .Setup(pingableService => pingableService.PingAsync(It.IsAny<CancellationToken>()))
                     .ReturnsAsync(true);
             }
 
-            pingableServices.Add(mockedPingableService.Object);
+            yield return mockedPingableService.Object;
         }
-
-        return pingableServices;
     }
 
     [Theory]
@@ -168,7 +166,7 @@ public class StatusControllerTests
 
     private static Type[] GetServiceTypes()
     {
-        return new[] { typeof(ConferenceEventsService) };
+        return [typeof(ConferenceEventsService)];
     }
 
     [Fact]
@@ -305,10 +303,10 @@ public class StatusControllerTests
 
         var mockedUnknownService = new Mock<IPingableService>();
         mockedUnknownService
-            .Setup(_ => _.PingAsync(It.IsAny<CancellationToken>()))
+            .Setup(pingableService => pingableService.PingAsync(It.IsAny<CancellationToken>()))
             .ReturnsAsync(true);
         mockedUnknownService
-            .Setup(_ => _.ServiceName)
+            .Setup(pingableService => pingableService.ServiceName)
             .Returns("Bomb");
 
         pingableServices.Add(mockedUnknownService.Object);

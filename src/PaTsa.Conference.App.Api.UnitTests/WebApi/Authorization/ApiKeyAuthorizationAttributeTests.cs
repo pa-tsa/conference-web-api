@@ -46,7 +46,7 @@ public class ApiKeyAuthorizationAttributeTests
             RequestServices = serviceCollection.BuildServiceProvider()
         };
 
-        defaultContext.Request.Headers.Add(ApiKeyAuthorizationAttribute.ApiHeaderKey, ApiKey);
+        defaultContext.Request.Headers.Append(ApiKeyAuthorizationAttribute.ApiHeaderKey, ApiKey);
 
         var actionContext = new ActionContext(defaultContext, new RouteData(), new ActionDescriptor());
 
@@ -132,7 +132,7 @@ public class ApiKeyAuthorizationAttributeTests
             RequestServices = serviceCollection.BuildServiceProvider()
         };
 
-        defaultContext.Request.Headers.Add(ApiKeyAuthorizationAttribute.ApiHeaderKey, apiKey);
+        defaultContext.Request.Headers.Append(ApiKeyAuthorizationAttribute.ApiHeaderKey, apiKey);
 
         var actionContext = new ActionContext(defaultContext, new RouteData(), new ActionDescriptor());
 
