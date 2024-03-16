@@ -2,7 +2,7 @@
 
 public static class ConfigurationKeys
 {
-    public const string MongoDbConnectionString = "MongoDb";
+    public const string ConnectionStringKeyName = "CosmosDb";
 
     public const string ConferenceDatabaseSection = "ConferenceDatabase";
 }

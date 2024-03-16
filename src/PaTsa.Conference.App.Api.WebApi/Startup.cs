@@ -50,7 +50,7 @@ public class Startup
         // MongoDB Client
         services.Add(
             new ServiceDescriptor(typeof(IMongoClient),
-                new MongoClient(Configuration.GetConnectionString(ConfigurationKeys.MongoDbConnectionString))));
+                new MongoClient(Configuration.GetConnectionString(ConfigurationKeys.ConnectionStringKeyName))));
 
         // MongoDB Services
         services.AddSingleton<IConferenceEventsService, ConferenceEventsService>();
